@@ -4,6 +4,10 @@
 ```
 npm install axios
 ```
+## node-modules 설치
+```
+npm install
+```
 
 ### Compiles and hot-reloads for development
 ```
