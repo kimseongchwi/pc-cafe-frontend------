@@ -163,7 +163,7 @@
         try {
           await axios.post('http://localhost:3000/api/auth/register', this.form);
           alert('회원가입이 완료되었습니다.');
-          this.$router.push('/login');
+          this.$router.push('/');
         } catch (error) {
           console.error('Register error:', error.response || error);
           alert(error.response?.data?.message || '회원가입에 실패했습니다.');

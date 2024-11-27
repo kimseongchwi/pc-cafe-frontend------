@@ -15,7 +15,7 @@
             :class="{ active: currentTab === 'orders' }"
             @click="currentTab = 'orders'"
           >
-          주문 관리
+          주문 관리({{ orders.length }})
     </button>
     <div class="user-info">
       <span>{{ name }} 님</span>
@@ -517,7 +517,7 @@ logout() {
   sessionStorage.removeItem('token');
   sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('userName');
-  this.$router.push('/login');
+  this.$router.push('/');
 }
 },
  mounted() {
