@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <header class="header">
-      <h1>OO PC방에 오신 것을 환영합니다</h1>
+      <h1>OO PC방에 방문해주셔서 감사합니다</h1>
     </header>
     
     <div class="container">

@@ -161,7 +161,7 @@
                 <option value="pending">대기 중</option>
                 <option value="processing">처리 중</option>
                 <option value="completed">완료</option>
-                <option value="cancelled">취소됨</option>
+                <option value="cancelled">취소</option>
               </select>
             </div>
   
@@ -200,7 +200,7 @@
                       <option value="pending">대기 중</option>
                       <option value="processing">처리 중</option>
                       <option value="completed">완료</option>
-                      <option value="cancelled">취소됨</option>
+                      <option value="cancelled">취소</option>
                     </select>
                   </td>
                 </tr>
@@ -500,7 +500,7 @@ async deleteMenu(id) {
  if (!confirm('정말 삭제하시겠습니까?')) return;
 
  try {
-  const token = sessionStorage.getItem('token');
+   const token = sessionStorage.getItem('token');
    await axios.delete(`/api/menus/${id}`, {
      headers: {
        'Authorization': `Bearer ${token}`
@@ -517,7 +517,7 @@ logout() {
   sessionStorage.removeItem('token');
   sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('userName');
-  this.$router.push('/');
+  this.$router.push('/login');
 }
 },
  mounted() {

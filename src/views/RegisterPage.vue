@@ -82,7 +82,7 @@
           </button>
   
           <div class="auth-links">
-            <router-link to="/login">이미 계정이 있으신가요? 로그인</router-link>
+            <router-link to="/">이미 계정이 있으신가요? 로그인</router-link>
           </div>
         </form>
       </div>
@@ -230,7 +230,7 @@
   .check-button {
     background-color: #6c757d;
     color: white;
-    min-width: 80px;
+    min-width: 100px;
   }
   
   .check-button:disabled {
