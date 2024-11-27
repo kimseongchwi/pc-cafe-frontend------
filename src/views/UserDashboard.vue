@@ -304,7 +304,7 @@
   sessionStorage.removeItem('token');
   sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('userName');
-  this.$router.push('/login');
+  this.$router.push('/');
 }
     },
     mounted() {
@@ -341,6 +341,26 @@
   margin-bottom: 2rem;
   display: flex;
   gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #0056b3;
 }
 
 .order-section {

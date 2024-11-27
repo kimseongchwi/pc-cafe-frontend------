@@ -517,7 +517,7 @@ logout() {
   sessionStorage.removeItem('token');
   sessionStorage.removeItem('userRole');
   sessionStorage.removeItem('userName');
-  this.$router.push('/login');
+  this.$router.push('/');
 }
 },
  mounted() {
