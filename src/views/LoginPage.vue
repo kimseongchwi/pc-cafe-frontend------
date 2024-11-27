@@ -34,39 +34,35 @@
     },
     methods: {
       async handleLogin() {
-        try {
-          const response = await axios.post('http://localhost:3000/api/auth/login', {
-            username: this.username,
-            password: this.password
-          });
-          
-          if (response.data.user && response.data.token) {
-            const { role } = response.data.user;
-            
-            // 토큰과 사용자 정보 저장
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('userRole', role);
-            localStorage.setItem('userName', response.data.user.name);
-            
-            // role에 따른 리다이렉션
-            if (role === 'admin') {
-              this.$router.push('/admin');
-            } else if (role === 'user') {
-              this.$router.push('/user');
-            } else {
-              throw new Error('Invalid user role');
-            }
-          } else {
-            throw new Error('Invalid response data');
-          }
-        } catch (error) {
-          console.error('Login error:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('userRole');
-          localStorage.removeItem('userName');
-          alert(error.response?.data?.message || '로그인에 실패했습니다.');
-        }
+  try {
+    const response = await axios.post('http://localhost:3000/api/auth/login', {
+      username: this.username,
+      password: this.password
+    });
+    
+    if (response.data.user && response.data.token) {
+      const { role } = response.data.user;
+      
+      // localStorage 대신 sessionStorage 사용
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('userRole', role);
+      sessionStorage.setItem('userName', response.data.user.name);
+      
+      if (role === 'admin') {
+        this.$router.push('/admin');
+      } else if (role === 'user') {
+        this.$router.push('/user');
       }
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    // 에러 시 세션 스토리지 클리어
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userName');
+    alert(error.response?.data?.message || '로그인에 실패했습니다.');
+  }
+}
     }
   }
   </script>

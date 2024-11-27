@@ -215,7 +215,7 @@
           'pending': '주문 접수',
           'processing': '처리 중',
           'completed': '완료',
-          'cancelled': '취소됨'
+          'cancelled': '취소'
         };
         return statusMap[status] || status;
       },
@@ -232,7 +232,7 @@
       },
       async fetchUserInfo() {
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           const response = await axios.get('http://localhost:3000/api/users/me', {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -246,7 +246,7 @@
       },
       async fetchMenus() {
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           const response = await axios.get('http://localhost:3000/api/menus', {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -259,7 +259,7 @@
       },
       async fetchOrders() {
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           const response = await axios.get('http://localhost:3000/api/orders', {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -276,7 +276,7 @@
         }
   
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           for (const menu of this.cartItems) {
             await axios.post('/api/orders', 
               {
@@ -301,10 +301,11 @@
         }
       },
       logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        this.$router.push('/login');
-      }
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('userRole');
+  sessionStorage.removeItem('userName');
+  this.$router.push('/login');
+}
     },
     mounted() {
       this.fetchUserInfo();

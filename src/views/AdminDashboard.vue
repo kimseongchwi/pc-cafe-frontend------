@@ -15,12 +15,13 @@
             :class="{ active: currentTab === 'orders' }"
             @click="currentTab = 'orders'"
           >
-            주문 관리
-          </button>
-          <button @click="logout" class="logout-button">
-            로그아웃
-          </button>
-        </div>
+          주문 관리
+    </button>
+    <div class="user-info">
+      <span>{{ name }} 님</span>
+      <button @click="logout" class="logout-button">로그아웃</button>
+    </div>
+  </div>
       </header>
   
       <div class="container">
@@ -289,6 +290,7 @@
     name: 'AdminDashboard',
     data() {
       return {
+        name: '',  // 추가
         currentTab: 'menu',
         orderStatusFilter: 'all',
         orders: [],
@@ -322,6 +324,19 @@
       }
     },
     methods: {
+      async fetchUserInfo() {
+    try {
+      const token = sessionStorage.getItem('token');
+      const response = await axios.get('http://localhost:3000/api/users/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      this.name = response.data.name;
+    } catch (error) {
+      console.error('사용자 정보 로드 실패:', error);
+    }
+  },
       formatDate(dateString) {
         return new Date(dateString).toLocaleString();
       },
@@ -336,7 +351,7 @@
       },
       async fetchOrders() {
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           const response = await axios.get('/api/orders', {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -350,7 +365,7 @@
       },
       async updateOrderStatus(orderId, status) {
         try {
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           await axios.put(
             `/api/orders/${orderId}`, 
             { status },
@@ -381,58 +396,59 @@
         }
       },
       async fetchMenus() {
-        try {
-          const token = localStorage.getItem('token');
-          const response = await axios.get('/api/menus', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          this.menus = response.data;
-        } catch (error) {
-          console.error('메뉴 로딩 실패:', error);
-          alert('메뉴를 불러오는데 실패했습니다.');
-        }
-      },
-      async addMenu() {
-        if (!this.newMenu.name || !this.newMenu.price) {
-          alert('메뉴명과 가격을 모두 입력해주세요.');
-          return;
-        }
-  
-        try {
-          const token = localStorage.getItem('token');
-          const formData = new FormData();
-          formData.append('name', this.newMenu.name);
-          formData.append('price', this.newMenu.price);
-          formData.append('category', this.newMenu.category);
-          if (this.imageFile) {
-            formData.append('image', this.imageFile);
-          }
-  
-          await axios.post('/api/menus', formData, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-          
-          this.fetchMenus();
-          this.newMenu = {
-            name: '',
-            price: '',
-            category: '식사'
-          };
-          this.imageFile = null;
-          this.imagePreview = null;
-          if (this.$refs.fileInput) {
-            this.$refs.fileInput.value = '';
-          }
-        } catch (error) {
-          console.error('메뉴 추가 실패:', error);
-          alert('메뉴 추가에 실패했습니다.');
-        }
-      },
+  try {
+    const token = sessionStorage.getItem('token');
+    const response = await axios.get('/api/menus', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    this.menus = response.data;
+  } catch (error) {
+    console.error('메뉴 로딩 실패:', error);
+  }
+},
+
+async addMenu() {
+  if (!this.newMenu.name || !this.newMenu.price) {
+    alert('메뉴명과 가격을 모두 입력해주세요.');
+    return;
+  }
+
+  try {
+    const token = sessionStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('name', this.newMenu.name);
+    formData.append('price', this.newMenu.price);
+    formData.append('category', this.newMenu.category);
+    if (this.imageFile) {
+      formData.append('image', this.imageFile);
+    }
+
+    await axios.post('/api/menus', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    await this.fetchMenus();
+    this.newMenu = {
+      name: '',
+      price: '',
+      category: '식사'
+    };
+    this.imageFile = null;
+    this.imagePreview = null;
+    if (this.$refs.fileInput) {
+      this.$refs.fileInput.value = '';
+    }
+    alert('메뉴가 추가되었습니다.');
+  } catch (error) {
+    console.error('메뉴 추가 실패:', error);
+    alert(error.response?.data?.message || '메뉴 추가에 실패했습니다.');
+  }
+},
       startEdit(menu) {
         this.editingMenu = { ...menu };
         this.editImagePreview = menu.imageUrl;
@@ -444,7 +460,7 @@
         }
   
         try {
- const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
  const formData = new FormData();
  formData.append('name', this.editingMenu.name);
  formData.append('price', this.editingMenu.price);
@@ -484,7 +500,7 @@ async deleteMenu(id) {
  if (!confirm('정말 삭제하시겠습니까?')) return;
 
  try {
-   const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
    await axios.delete(`/api/menus/${id}`, {
      headers: {
        'Authorization': `Bearer ${token}`
@@ -498,12 +514,14 @@ async deleteMenu(id) {
 },
 
 logout() {
- localStorage.removeItem('token');
- localStorage.removeItem('userRole');
- this.$router.push('/login');
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('userRole');
+  sessionStorage.removeItem('userName');
+  this.$router.push('/login');
 }
 },
  mounted() {
+  this.fetchUserInfo();
    this.fetchMenus();
    this.fetchOrders();
  }
@@ -530,16 +548,26 @@ logout() {
  margin-top: 1rem;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.user-info span {
+  color: white;
+}
+
 .logout-button {
- position: absolute;
- right: 1rem;
- top: 1rem;
- padding: 0.5rem 1rem;
- background-color: #dc3545;
- color: white;
- border: none;
- border-radius: 4px;
- cursor: pointer;
+  padding: 0.5rem 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .container {

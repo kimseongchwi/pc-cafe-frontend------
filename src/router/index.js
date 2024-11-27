@@ -41,8 +41,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
+  const token = sessionStorage.getItem('token');
+  const userRole = sessionStorage.getItem('userRole');
 
   // 인증이 필요한 페이지
   if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -54,7 +54,7 @@ router.beforeEach((to, from, next) => {
     // 관리자 전용 페이지
     if (to.matched.some(record => record.meta.requiresAdmin)) {
       if (userRole !== 'admin') {
-        next('/user');
+        next('/login');  // user 페이지 대신 로그인 페이지로 리다이렉트
         return;
       }
     }
@@ -62,7 +62,7 @@ router.beforeEach((to, from, next) => {
     // 일반 사용자 전용 페이지
     if (to.matched.some(record => record.meta.requiresUser)) {
       if (userRole !== 'user') {
-        next('/admin');
+        next('/login');  // admin 페이지 대신 로그인 페이지로 리다이렉트
         return;
       }
     }

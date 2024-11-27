@@ -22,7 +22,7 @@
     name: 'HomePage',
     mounted() {
       // 이미 로그인한 사용자가 홈페이지 접근 시 리다이렉트
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const userRole = localStorage.getItem('userRole');
       
       if (token) {
