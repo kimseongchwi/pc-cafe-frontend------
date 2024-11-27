@@ -66,6 +66,7 @@ export default {
         sessionStorage.removeItem('userRole');
         sessionStorage.removeItem('userName');
         alert(error.response?.data?.message || '로그인에 실패했습니다.');
+        this.$router.push('/'); // 메인 페이지로 리다이렉션
       }
     }
   },
