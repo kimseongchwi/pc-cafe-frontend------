@@ -56,10 +56,10 @@
       <!-- 장바구니 영역 -->
       <div class="cart-section">
         <div class="cart-container">
-          <h2>장바구니</h2>
+          <h2>주문 리스트</h2>
           
           <div v-if="cartItems.length === 0" class="empty-cart">
-            <p>장바구니가 비어있습니다</p>
+            <p>리스트가 비어있습니다</p>
           </div>
   
           <div v-else>

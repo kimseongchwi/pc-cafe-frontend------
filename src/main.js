@@ -28,7 +28,7 @@ axios.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('userRole');
       localStorage.removeItem('userName');
-      router.push('/login');
+      router.push('/');
     }
     return Promise.reject(error);
   }

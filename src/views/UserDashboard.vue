@@ -32,6 +32,7 @@
         v-if="currentTab === 'order'"
         :menus="menus"
         @order-placed="handleOrderPlaced"
+        @refresh-menus="fetchMenus"
       />
       
       <OrderHistory
@@ -45,7 +46,6 @@
 
 <script>
 import axios from 'axios'
-import io from 'socket.io-client'
 import OrderMenu from '@/components/user/OrderMenu.vue'
 import OrderHistory from '@/components/user/OrderHistory.vue'
 
@@ -60,7 +60,8 @@ export default {
       currentTab: 'order',
       name: '',
       menus: [],
-      orders: []
+      orders: [],
+      refreshInterval: null
     }
   },
   methods: {
@@ -116,6 +117,9 @@ export default {
       }
     },
     logout() {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval);
+      }
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('userRole');
       this.$router.push('/');
@@ -126,13 +130,17 @@ export default {
     this.fetchMenus();
     this.fetchOrders();
 
-    const socket = io('http://localhost:3000');
-    socket.on('order-status-updated', (orderId, status) => {
-      const order = this.orders.find(o => o.id === orderId);
-      if (order) {
-        order.status = status;
+    // 2초마다 메뉴 목록 자동 새로고침
+    this.refreshInterval = setInterval(() => {
+      if (this.currentTab === 'order') {
+        this.fetchMenus();
       }
-    });
+    }, 2000);
+  },
+  beforeUnmount() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
 }
 </script>
