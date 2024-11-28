@@ -2,7 +2,7 @@
   <div class="user-dashboard">
     <header class="header">
       <div class="header-content">
-        <h1 class="header-title">메뉴 주문</h1>
+        <h1 class="header-title">OO PC방</h1>
         <div class="user-info">
           <span>{{ name }} 님</span>
           <button @click="logout" class="logout-button">로그아웃</button>
@@ -17,7 +17,7 @@
           :class="{ active: currentTab === 'order' }"
           @click="currentTab = 'order'"
         >
-          주문하기
+          메뉴주문
         </button>
         <button 
           class="tab-button"
