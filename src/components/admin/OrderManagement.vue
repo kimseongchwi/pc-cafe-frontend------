@@ -17,32 +17,34 @@
         <div v-for="(groupOrders, date) in groupedOrders" :key="date" class="order-group">
           <h3 class="date-header">{{ formatDateHeader(date) }}</h3>
           <table class="order-table">
-            <thead>
-              <tr>
-                <th>주문 시간</th>
-                <th>주문자</th>
-                <th>메뉴</th>
-                <th>수량</th>
-                <th>금액</th>
-                <th>결제 방식</th>
-                <th>상태</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in groupOrders" :key="order.id">
-                <td>{{ formatTime(order.created_at) }}</td>
-                <td>{{ order.username }}</td>
-                <td>{{ order.menuName }}</td>
-                <td>{{ order.quantity }}</td>
-                <td>{{ (order.price * order.quantity).toLocaleString() }}원</td>
-                <td>{{ order.payment_method === 'card' ? '카드' : '현금' }}</td>
-                <td>
-                  <span class="status-badge" :class="order.status">
-                    {{ getStatusText(order.status) }}
-                  </span>
-                </td>
-                <td class="status-buttons">
+  <thead>
+    <tr>
+      <th>주문 시간</th>
+      <th>좌석 번호</th>  <!-- 새로 추가 -->
+      <th>주문자</th>
+      <th>메뉴</th>
+      <th>수량</th>
+      <th>금액</th>
+      <th>결제 방식</th>
+      <th>상태</th>
+      <th>관리</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="order in groupOrders" :key="order.id">
+      <td>{{ formatTime(order.created_at) }}</td>
+      <td>{{ order.seat_number }}번</td>  <!-- 새로 추가 -->
+      <td>{{ order.user_name }}</td>
+      <td>{{ order.menuName }}</td>
+      <td>{{ order.quantity }}</td>
+      <td>{{ (order.price * order.quantity).toLocaleString() }}원</td>
+      <td>{{ order.payment_method === 'card' ? '카드' : '현금' }}</td>
+      <td>
+        <span class="status-badge" :class="order.status">
+          {{ getStatusText(order.status) }}
+        </span>
+      </td>
+      <td class="status-buttons">
                   <button 
                     v-for="status in ['pending', 'processing', 'completed', 'cancelled']"
                     :key="status"
@@ -214,7 +216,7 @@
 .order-table th,
 .order-table td {
   padding: 1rem;
-  text-align: left;
+  text-align: center;  /* left에서 center로 변경 */
   vertical-align: middle;
 }
 
@@ -335,6 +337,8 @@
   .order-table th,
   .order-table td {
     min-width: 120px;
+    text-align: center;  /* left에서 center로 변경 */
+  vertical-align: middle;
   }
 
   .order-table th:last-child,
