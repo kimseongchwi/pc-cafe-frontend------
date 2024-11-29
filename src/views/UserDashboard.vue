@@ -116,13 +116,26 @@ export default {
         this.logout();
       }
     },
-    logout() {
-      if (this.refreshInterval) {
-        clearInterval(this.refreshInterval);
+    async logout() {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.post('/api/auth/logout', {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch (error) {
+        console.error('로그아웃 실패:', error);
+      } finally {
+        if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+        }
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('seatNumber');
+        this.$router.push('/');
       }
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('userRole');
-      this.$router.push('/');
     }
   },
   mounted() {
@@ -155,10 +168,6 @@ export default {
   background-color: #333;
   color: white;
   padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .header-content {

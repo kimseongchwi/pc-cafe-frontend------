@@ -9,16 +9,15 @@
       <div class="seat-section" v-if="!isAdmin">
         <h2>좌석 현황</h2>
         <div class="seat-container">
-          <div v-for="i in 20" 
-               :key="i" 
+          <div v-for="seat in seats" 
+               :key="seat.number" 
                class="seat"
                :class="{ 
-                 'occupied': selectedSeat === i,
-                 'in-use': i === 19 || i === 20 
+                 'occupied': seat.username
                }"
-               @click="selectSeat(i)">
-            <span class="seat-number">{{ i }}번</span>
-            <span class="status">{{ getSeatStatus(i) }}</span>
+               @click="!seat.username && selectSeat(seat.number)">
+            <span class="seat-number">{{ seat.number }}번</span>
+            <span class="status">{{ seat.username ? seat.username : '빈좌석' }}</span>
           </div>
         </div>
       </div>
@@ -89,12 +88,23 @@ export default {
       usernameError: false,
       passwordError: false,
       noSeatError: false,
-      isAdmin: false // 관리자인지 여부를 확인하는 속성 추가
+      isAdmin: false,
+      seats: [] // 좌석 정보를 저장할 배열
     }
   },
   methods: {
+    async fetchSeats() {
+      try {
+        const response = await axios.get('http://localhost:3000/api/seats');
+        this.seats = response.data;
+      } catch (error) {
+        console.error('좌석 정보 불러오기 실패:', error);
+      }
+    },
     selectSeat(seatNumber) {
-      if (seatNumber === 19 || seatNumber === 20) {
+      const seat = this.seats.find(s => s.number === seatNumber);
+      if (seat && seat.username) {
+        alert('이미 사용 중인 좌석입니다.');
         return;
       }
       
@@ -109,12 +119,6 @@ export default {
         this.noSeatError = false;
         this.clearAllErrors();
       }
-    },
-    getSeatStatus(seatNumber) {
-      if (seatNumber === 19 || seatNumber === 20) {
-        return '사용중';
-      }
-      return this.selectedSeat === seatNumber ? '선택됨' : '빈좌석';
     },
     async handleLogin() {
       if (!this.username || !this.password) {
@@ -133,10 +137,13 @@ export default {
         if (response.data.user && response.data.token) {
           this.loginError = false;
           this.noSeatError = false;
-          sessionStorage.setItem('token', response.data.token);
-          sessionStorage.setItem('userRole', response.data.user.role);
-          sessionStorage.setItem('userName', response.data.user.name);
-          sessionStorage.setItem('seatNumber', this.selectedSeat);
+          
+          if (response.data.user.role === 'admin' || this.selectedSeat) {
+            sessionStorage.setItem('token', response.data.token);
+            sessionStorage.setItem('userRole', response.data.user.role);
+            sessionStorage.setItem('userName', response.data.user.name);
+            sessionStorage.setItem('seatNumber', this.selectedSeat);
+          }
           
           if (response.data.user.role === 'admin') {
             this.isAdmin = true;
@@ -177,15 +184,23 @@ export default {
     }
   },
   mounted() {
+    this.fetchSeats();
     const token = sessionStorage.getItem('token');
     const userRole = sessionStorage.getItem('userRole');
+    const seatNumber = sessionStorage.getItem('seatNumber');
     
     if (token) {
       if (userRole === 'admin') {
         this.isAdmin = true;
         this.$router.push('/admin');
-      } else {
+      } else if (seatNumber) {
         this.$router.push('/user');
+      } else {
+        // 좌석 번호가 없으면 로그아웃 처리
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('seatNumber');
       }
     }
   }
@@ -270,12 +285,7 @@ body {
 .seat.occupied {
     background-color: #FF6B6B;
     color: white;
-}
-
-.seat.in-use {
-    background-color: #808080;
-    cursor: not-allowed;
-    color: white;
+    cursor: not-allowed; /* 금지 표시 커서 */
 }
 
 .seat-number {
