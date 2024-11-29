@@ -4,6 +4,7 @@
       <div class="header-content">
         <h1 class="header-title">OO PC방</h1>
         <div class="user-info">
+          <span class="seat-number">{{ seatNumber }}번 좌석</span>  <!-- 좌석 번호 추가 -->
           <span>{{ name }} 님</span>
           <button @click="logout" class="logout-button">로그아웃</button>
         </div>
@@ -59,6 +60,7 @@ export default {
     return {
       currentTab: 'order',
       name: '',
+      seatNumber: '',
       menus: [],
       orders: [],
       refreshInterval: null
@@ -74,6 +76,7 @@ export default {
           }
         });
         this.name = response.data.name;
+        this.seatNumber = response.data.seatNumber;
       } catch (error) {
         console.error('사용자 정보 로드 실패:', error);
         this.handleAuthError(error);
@@ -176,6 +179,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
 
 .header-title {
@@ -195,6 +199,13 @@ export default {
 .user-info span {
   font-size: 1rem;
   color: #f0f0f0;
+}
+.seat-number {
+  font-size: 1rem;
+  color: #f0f0f0;
+  background-color: #444;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
 }
 
 .logout-button {

@@ -24,7 +24,7 @@
       <th>주문자</th>
       <th>메뉴</th>
       <th>수량</th>
-      <th>금액</th>
+      <th>총액</th>
       <th>결제 방식</th>
       <th>상태</th>
       <th>관리</th>
@@ -216,22 +216,8 @@
 .order-table th,
 .order-table td {
   padding: 1rem;
-  text-align: center;  /* left에서 center로 변경 */
+  text-align: center;
   vertical-align: middle;
-}
-
-.order-table th:first-child,
-.order-table td:first-child {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-}
-
-.order-table th:last-child,
-.order-table td:last-child {
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  width: 300px;
-  min-width: 300px;
 }
 
 .status-badge {
@@ -246,67 +232,45 @@
   height: 24px;
 }
 
-.status-badge.pending { 
-  background-color: #ffd700; 
-}
+.status-badge.pending { background-color: #ffd700; }
+.status-badge.processing { background-color: #007bff; color: white; }
+.status-badge.completed { background-color: #28a745; color: white; }
+.status-badge.cancelled { background-color: #dc3545; color: white; }
 
-.status-badge.processing { 
-  background-color: #007bff; 
-  color: white; 
-}
-
-.status-badge.completed { 
-  background-color: #28a745; 
-  color: white; 
-}
-
-.status-badge.cancelled { 
-  background-color: #dc3545; 
-  color: white; 
-}
-
+/* 상태 버튼 컨테이너 수정 */
 .status-buttons {
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-start;
+  gap: 0.3rem;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
 }
 
+/* 상태 버튼 스타일 수정 */
 .status-btn {
   padding: 0.25rem 0.5rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   opacity: 0.6;
   white-space: nowrap;
-  flex: 1;
-  min-width: 60px;
+  min-width: 50px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .status-btn.active {
   opacity: 1;
 }
 
-.status-btn.pending {
-  background-color: #ffd700;
-  color: #000;
-}
-
-.status-btn.processing {
-  background-color: #007bff;
-  color: white;
-}
-
-.status-btn.completed {
-  background-color: #28a745;
-  color: white;
-}
-
-.status-btn.cancelled {
-  background-color: #dc3545;
-  color: white;
-}
+.status-btn.pending { background-color: #ffd700; color: #000; }
+.status-btn.processing { background-color: #007bff; color: white; }
+.status-btn.completed { background-color: #28a745; color: white; }
+.status-btn.cancelled { background-color: #dc3545; color: white; }
 
 .status-btn:hover {
   opacity: 0.8;
@@ -322,13 +286,8 @@
   color: #666;
 }
 
+/* 모바일 반응형 스타일 */
 @media (max-width: 768px) {
-  .status-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.25rem;
-  }
-  
   .order-table {
     display: block;
     overflow-x: auto;
@@ -336,15 +295,19 @@
 
   .order-table th,
   .order-table td {
-    min-width: 120px;
-    text-align: center;  /* left에서 center로 변경 */
-  vertical-align: middle;
+    min-width: 100px;
+    padding: 0.8rem;
   }
 
-  .order-table th:last-child,
-  .order-table td:last-child {
-    width: 200px;
-    min-width: 200px;
+  .status-buttons {
+    padding: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .status-btn {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    min-width: 45px;
   }
 }
 </style>
