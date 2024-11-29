@@ -6,7 +6,7 @@
     
     <div class="main-container">
       <!-- 좌석 섹션 -->
-      <div class="seat-section">
+      <div class="seat-section" v-if="!isAdmin">
         <h2>좌석 현황</h2>
         <div class="seat-container">
           <div v-for="i in 20" 
@@ -27,7 +27,7 @@
       <div class="auth-container">
         <h2>로그인</h2>
         <div class="notification-box">
-          <div v-if="!selectedSeat && !noSeatError" class="message-box">
+          <div v-if="!selectedSeat && !noSeatError && !isAdmin" class="message-box">
             좌석을 선택해주세요<br>
             감사합니다
           </div>
@@ -88,7 +88,8 @@ export default {
       loginError: false,
       usernameError: false,
       passwordError: false,
-      noSeatError: false
+      noSeatError: false,
+      isAdmin: false // 관리자인지 여부를 확인하는 속성 추가
     }
   },
   methods: {
@@ -97,7 +98,6 @@ export default {
         return;
       }
       
-      // 이미 선택된 좌석을 다시 클릭하면 선택 취소
       if (this.selectedSeat === seatNumber) {
         this.selectedSeat = null;
         return;
@@ -117,14 +117,6 @@ export default {
       return this.selectedSeat === seatNumber ? '선택됨' : '빈좌석';
     },
     async handleLogin() {
-      if (!this.selectedSeat) {
-        this.noSeatError = true;
-        setTimeout(() => {
-          this.noSeatError = false;
-        }, 2000);
-        return;
-      }
-
       if (!this.username || !this.password) {
         this.usernameError = !this.username;
         this.passwordError = !this.password;
@@ -147,8 +139,16 @@ export default {
           sessionStorage.setItem('seatNumber', this.selectedSeat);
           
           if (response.data.user.role === 'admin') {
+            this.isAdmin = true;
             this.$router.push('/admin');
           } else {
+            if (!this.selectedSeat) {
+              this.noSeatError = true;
+              setTimeout(() => {
+                this.noSeatError = false;
+              }, 2000);
+              return;
+            }
             this.$router.push('/user');
           }
         }
@@ -158,7 +158,6 @@ export default {
         this.usernameError = true;
         this.passwordError = true;
 
-        // 2초 후에 에러 메시지를 원래 메시지로 되돌림
         setTimeout(() => {
           this.loginError = false;
           this.usernameError = false;
@@ -183,6 +182,7 @@ export default {
     
     if (token) {
       if (userRole === 'admin') {
+        this.isAdmin = true;
         this.$router.push('/admin');
       } else {
         this.$router.push('/user');
