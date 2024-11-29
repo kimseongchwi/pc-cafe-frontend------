@@ -13,11 +13,11 @@
                :key="seat.number" 
                class="seat"
                :class="{ 
-                 'occupied': seat.username
+                 'occupied': seat.registerid
                }"
-               @click="!seat.username && selectSeat(seat.number)">
+               @click="!seat.registerid && selectSeat(seat.number)">
             <span class="seat-number">{{ seat.number }}번</span>
-            <span class="status">{{ seat.username ? seat.username : '빈좌석' }}</span>
+            <span class="status">{{ seat.registerid ? seat.registerid : '빈좌석' }}</span>
           </div>
         </div>
       </div>
@@ -47,10 +47,10 @@
           <div class="form-group">
             <label>아이디</label>
             <input 
-              v-model="username" 
+              v-model="registerid" 
               type="text" 
-              :class="{ 'input-error': usernameError }"
-              @focus="clearError('username')"
+              :class="{ 'input-error': registeridError }"
+              @focus="clearError('registerid')"
               required>
           </div>
           <div class="form-group">
@@ -81,11 +81,11 @@ export default {
   name: 'HomePage',
   data() {
     return {
-      username: '',
+      registerid: '',
       password: '',
       selectedSeat: null,
       loginError: false,
-      usernameError: false,
+      registeridError: false,
       passwordError: false,
       noSeatError: false,
       isAdmin: false,
@@ -103,7 +103,7 @@ export default {
     },
     selectSeat(seatNumber) {
       const seat = this.seats.find(s => s.number === seatNumber);
-      if (seat && seat.username) {
+      if (seat && seat.registerid) {
         alert('이미 사용 중인 좌석입니다.');
         return;
       }
@@ -121,15 +121,15 @@ export default {
       }
     },
     async handleLogin() {
-      if (!this.username || !this.password) {
-        this.usernameError = !this.username;
+      if (!this.registerid || !this.password) {
+        this.registeridError = !this.registerid;
         this.passwordError = !this.password;
         return;
       }
 
       try {
         const response = await axios.post('http://localhost:3000/api/auth/login', {
-          username: this.username,
+          registerid: this.registerid,
           password: this.password,
           seatNumber: this.selectedSeat
         });
@@ -162,22 +162,22 @@ export default {
       } catch (error) {
         console.error('Login error:', error);
         this.loginError = true;
-        this.usernameError = true;
+        this.registeridError = true;
         this.passwordError = true;
 
         setTimeout(() => {
           this.loginError = false;
-          this.usernameError = false;
+          this.registeridError = false;
           this.passwordError = false;
         }, 2000);
       }
     },
     clearError(field) {
-      if (field === 'username') this.usernameError = false;
+      if (field === 'registerid') this.registeridError = false;
       if (field === 'password') this.passwordError = false;
     },
     clearAllErrors() {
-      this.usernameError = false;
+      this.registeridError = false;
       this.passwordError = false;
       this.loginError = false;
       this.noSeatError = false;
@@ -206,6 +206,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 body {
