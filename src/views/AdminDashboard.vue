@@ -23,7 +23,7 @@
           </button>
         </div>
         <div class="user-info">
-          <span>{{ adminName }} 님</span>
+          <span>관리자 {{ adminName }} 님</span>
           <button @click="logout" class="logout-button">로그아웃</button>
         </div>
       </div>

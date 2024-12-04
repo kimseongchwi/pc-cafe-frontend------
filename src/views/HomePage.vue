@@ -71,6 +71,22 @@
         </div>
       </div>
     </div>
+
+    <!-- 시간 충전 팝업 -->
+    <div v-if="showTimeChargePopup" class="time-charge-popup">
+      <h2>시간 충전</h2>
+      <h3>남은 시간이 존재하지 않습니다</h3>
+      <div v-for="(price, hours) in timeOptions" :key="hours" class="time-option">
+        <button @click="chargeTime(hours)">{{ hours }}시간 - {{ price }}원</button>
+      </div>
+      <div>
+        <label>결제 방식:</label>
+        <select v-model="selectedPaymentMethod">
+          <option value="cash">현금</option>
+          <option value="card">카드</option>
+        </select>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -89,7 +105,18 @@ export default {
       passwordError: false,
       noSeatError: false,
       isAdmin: false,
-      seats: [] // 좌석 정보를 저장할 배열
+      seats: [], // 좌석 정보를 저장할 배열
+      showTimeChargePopup: false,
+      timeOptions: {
+        1: 1000,
+        2: 2000,
+        3: 3000,
+        5: 5000,
+        10: 10000,
+        50: 50000,
+        100: 100000
+      },
+      selectedPaymentMethod: 'cash'
     }
   },
   methods: {
@@ -156,6 +183,10 @@ export default {
               }, 2000);
               return;
             }
+            if (response.data.user.available_time <= 0) {
+              this.showTimeChargePopup = true;
+              return;
+            }
             this.$router.push('/user');
           }
         }
@@ -170,6 +201,23 @@ export default {
           this.registeridError = false;
           this.passwordError = false;
         }, 2000);
+      }
+    },
+    async chargeTime(hours) {
+      try {
+        const response = await axios.post('http://localhost:3000/api/time-charge', {
+          hours,
+          paymentMethod: this.selectedPaymentMethod
+        }, {
+          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
+        });
+
+        alert(response.data.message);
+        this.showTimeChargePopup = false;
+        this.$router.push('/user');
+      } catch (error) {
+        console.error('시간 충전 오류:', error);
+        alert('시간 충전에 실패했습니다.');
       }
     },
     clearError(field) {
@@ -206,7 +254,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
 body {
@@ -415,5 +462,38 @@ input:focus {
 
 .auth-links a:hover {
     text-decoration: underline;
+}
+
+/* 시간 충전 팝업 */
+.time-charge-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.time-option {
+    margin-bottom: 1rem;
+}
+
+.time-option button {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.time-option button:hover {
+    background-color: #0056b3;
 }
 </style>
