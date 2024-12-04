@@ -6,7 +6,7 @@
         <div class="user-info">
           <span class="seat-number">{{ seatNumber }}번 좌석</span>  <!-- 좌석 번호 추가 -->
           <span>{{ name }} 님</span>
-          <button @click="logout" class="logout-button">로그아웃</button>
+          <button @click="logout" class="logout-button">사용종료</button>
         </div>
       </div>
     </header>
