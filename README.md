@@ -1,5 +1,7 @@
 # pc-cafe-frontend
-
+```
+npm install -g @vue/cli
+```
 ## Project setup
 ```
 npm install axios
