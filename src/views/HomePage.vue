@@ -17,6 +17,7 @@
                }"
                @click="!seat.registerid && selectSeat(seat.number)">
             <span class="seat-number">{{ seat.number }}번</span>
+            <span v-if="seat.registerid" class="remaining-time">{{ formatTime(seat.available_time) }}</span>
             <span class="status">{{ seat.registerid ? seat.registerid : '빈좌석' }}</span>
           </div>
         </div>
@@ -129,6 +130,12 @@ export default {
         console.error('좌석 정보 불러오기 실패:', error);
       }
     },
+    formatTime(seconds) {
+    if (!seconds) return '0분';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+  },
     selectSeat(seatNumber) {
       const seat = this.seats.find(s => s.number === seatNumber);
       if (seat && seat.registerid) {
@@ -288,6 +295,14 @@ body {
     max-width: 1600px;
     margin: 0 auto;
 }
+.remaining-time {
+    position: absolute;
+    top: 5px;       /* 위치 조정 */
+    right: 5px;     /* 위치 조정 */
+    font-size: 12px;
+    color: #333;
+    opacity: 0.8;
+}
 
 /* 좌석 섹션 */
 .seat-section {
@@ -315,10 +330,11 @@ body {
 .seat {
     position: relative;
     border: 1px solid #999;
-    padding: 30px 20px;
+    padding: 35px 25px;  /* padding 증가 */
     text-align: center;
     border-radius: 6px;
-    height: 45px;
+    height: 60px;        /* height 증가 */
+    width: 140px;        /* width 추가 */
     cursor: pointer;
     background-color: #90EE90;
     transition: background-color 0.3s ease;
@@ -339,8 +355,8 @@ body {
 
 .seat-number {
     position: absolute;
-    top: 3px;
-    left: 3px;
+    top: 5px;       /* 위치 조정 */
+    left: 5px;      /* 위치 조정 */
     font-size: 12px;
     color: #333;
     font-weight: bold;
@@ -510,5 +526,33 @@ input:focus {
 
 .time-option button:hover {
     background-color: #0056b3;
+}
+/* 반응형 디자인을 위한 미디어 쿼리 추가 */
+@media (max-width: 1200px) {
+    .seat-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .seat-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .seat-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .seat-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    
+    .seat {
+        width: 100%;
+    }
 }
 </style>

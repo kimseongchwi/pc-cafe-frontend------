@@ -185,25 +185,28 @@
 }
 
 .seat-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(150px, 1fr));  /* 최소 너비 설정 */
+    gap: 12px;  /* gap 감소 */
+    margin-top: 1rem;
+    justify-content: center;  /* 중앙 정렬 */
 }
 
 .seat {
   position: relative;
   border: 1px solid #ddd;
-  padding: 20px;
+  padding: 15px;  /* 20px에서 15px로 줄임 */
   text-align: center;
   border-radius: 8px;
   cursor: context-menu;
   background-color: #90EE90;
-  height: 100px; /* 고정 높이 설정 */
-  width: 150px;  /* 고정 너비 설정 */
+  height: 80px;   /* 100px에서 80px로 줄임 */
+  width: 120px;   /* 150px에서 120px로 줄임 */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin: 0 auto;  /* 중앙 정렬 */
 }
 
 .seat.occupied {
@@ -213,31 +216,31 @@
 
 .seat-number {
   position: absolute;
-  top: 5px;
-  left: 5px;
-  font-size: 12px;
+  top: 3px;      /* 5px에서 3px로 줄임 */
+  left: 3px;     /* 5px에서 3px로 줄임 */
+  font-size: 11px; /* 12px에서 11px로 줄임 */
 }
 
 .seat-info {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  font-size: 14px; /* 글자 크기 조정 */
+  gap: 3px;      /* 5px에서 3px로 줄임 */
+  font-size: 12px; /* 14px에서 12px로 줄임 */
   width: 100%;
 }
 
 .user-name {
   font-weight: bold;
-  margin-bottom: 4px;
-  font-size: 16px;
+  margin-bottom: 2px; /* 4px에서 2px로 줄임 */
+  font-size: 14px;    /* 16px에서 14px로 줄임 */
 }
 
 .remaining-time {
-  font-size: 14px;
+  font-size: 12px;    /* 14px에서 12px로 줄임 */
 }
 
 .status {
-  font-size: 16px;
+  font-size: 14px;    /* 16px에서 14px로 줄임 */
 }
 
 .context-menu {
@@ -325,32 +328,38 @@
   color: white;
 }
 
-/* 반응형 디자인을 위한 미디어 쿼리 */
+/* 반응형 디자인 수정 */
 @media (max-width: 1200px) {
-  .seat-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
+    .seat-container {
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        max-width: 900px;  /* 최대 너비 제한 */
+        margin: 1rem auto;
+    }
 }
 
 @media (max-width: 992px) {
-  .seat-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
+    .seat-container {
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+        max-width: 700px;
+    }
 }
 
 @media (max-width: 768px) {
-  .seat-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    .seat-container {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+        max-width: 500px;
+    }
 }
 
 @media (max-width: 576px) {
-  .seat-container {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  
-  .seat {
-    width: 100%;
-  }
+    .seat-container {
+        grid-template-columns: repeat(1, minmax(150px, 1fr));
+        max-width: 300px;
+    }
+    
+    .seat {
+        width: 100%;
+        max-width: 200px;  /* 모바일에서 최대 너비 제한 */
+    }
 }
 </style>
