@@ -86,6 +86,7 @@
           <option value="card">카드</option>
         </select>
       </div>
+      <button @click="showTimeChargePopup = false" class="close-popup">닫기</button>
     </div>
   </div>
 </template>
@@ -350,6 +351,20 @@ body {
     font-size: 17px;
     font-weight: bold;
     white-space: nowrap;
+}
+.close-popup {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-popup:hover {
+  background-color: #ddd;
 }
 
 /* 로그인 섹션 */

@@ -130,7 +130,8 @@ export default {
       categories: ['식사', '라면', '음료', '과자'],
       quantities: {},
       paymentMethod: 'card',
-      seatNumber: sessionStorage.getItem('seatNumber') || null
+      seatNumber: sessionStorage.getItem('seatNumber') || null,
+      refreshInterval: null
     }
   },
   computed: {
@@ -150,6 +151,18 @@ export default {
     },
     cartCount() {
       return Object.values(this.quantities).reduce((total, qty) => total + qty, 0);
+    }
+  },
+  created() {
+    // 컴포넌트가 생성될 때 2초마다 메뉴 새로고침
+    this.refreshInterval = setInterval(() => {
+      this.$emit('refresh-menus');
+    }, 2000);
+  },
+  beforeUnmount() {
+    // 컴포넌트가 제거될 때 인터벌 정리
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   },
   methods: {

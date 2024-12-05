@@ -1,12 +1,17 @@
 <template>
   <div class="user-dashboard">
+    <!-- 시간 알림 메시지 -->
+    <div v-if="showTimeNotification" class="time-notification">
+      남은 시간은 {{ timeNotificationMessage }}분 입니다
+    </div>
+
     <header class="header">
       <div class="header-content">
         <h1 class="header-title">OO PC방</h1>
         <div class="user-info">
           <span class="seat-number">{{ seatNumber }}번 좌석</span>
           <span>{{ name }} 님</span>
-          <span class="time-remaining">{{ formattedTime }}</span> <!-- 남은 시간 표시 -->
+          <span class="time-remaining">{{ formattedTime }}</span>
           <button @click="showTimeChargePopup = true" class="charge-button">시간 충전</button>
           <button @click="logout" class="logout-button">사용종료</button>
         </div>
@@ -81,7 +86,7 @@ export default {
       seatNumber: '',
       menus: [],
       orders: [],
-      availableTime: 0, // 사용 가능한 시간 (초 단위)
+      availableTime: 0,
       refreshInterval: null,
       timeInterval: null,
       showTimeChargePopup: false,
@@ -94,7 +99,10 @@ export default {
         50: 50000,
         100: 100000
       },
-      selectedPaymentMethod: 'cash'
+      selectedPaymentMethod: 'cash',
+      showTimeNotification: false,
+      timeNotificationMessage: '',
+      notificationTimeout: null,
     }
   },
   computed: {
@@ -106,6 +114,35 @@ export default {
     }
   },
   methods: {
+    // F5 키 이벤트 핸들러 추가
+    handleF5(event) {
+      if (event.key === 'F5' || (event.ctrlKey && event.key === 'r')) {
+        event.preventDefault();
+        return false;
+      }
+    },
+
+    // 브라우저 뒤로가기 방지
+    preventBrowserBack() {
+      history.pushState(null, '', location.href);
+      window.onpopstate = () => {
+        history.pushState(null, '', location.href);
+      };
+    },
+
+    showNotification(minutes) {
+      this.timeNotificationMessage = minutes;
+      this.showTimeNotification = true;
+      
+      if (this.notificationTimeout) {
+        clearTimeout(this.notificationTimeout);
+      }
+      
+      this.notificationTimeout = setTimeout(() => {
+        this.showTimeNotification = false;
+      }, 10000);
+    },
+
     async fetchUserInfo() {
       try {
         const token = sessionStorage.getItem('token');
@@ -116,7 +153,7 @@ export default {
         });
         this.name = response.data.name;
         this.seatNumber = response.data.seatNumber;
-        this.availableTime = response.data.available_time; // 초 단위로 저장된 시간 그대로 사용
+        this.availableTime = response.data.available_time;
       } catch (error) {
         console.error('사용자 정보 로드 실패:', error);
         this.handleAuthError(error);
@@ -163,7 +200,7 @@ export default {
       try {
         const token = sessionStorage.getItem('token');
         await axios.post('/api/auth/logout', {
-          remainingTime: this.availableTime // 남은 시간을 서버에 전송
+          remainingTime: this.availableTime
         }, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -178,6 +215,9 @@ export default {
         if (this.timeInterval) {
           clearInterval(this.timeInterval);
         }
+        if (this.notificationTimeout) {
+          clearTimeout(this.notificationTimeout);
+        }
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('userRole');
         sessionStorage.removeItem('userName');
@@ -189,6 +229,13 @@ export default {
       this.timeInterval = setInterval(() => {
         if (this.availableTime > 0) {
           this.availableTime--;
+          
+          const minutes = Math.floor(this.availableTime / 60);
+          
+          if (minutes === 30 || minutes === 10 || minutes === 5 || 
+              minutes === 3 || minutes === 1) {
+            this.showNotification(minutes);
+          }
         } else {
           clearInterval(this.timeInterval);
           alert('사용 가능한 시간이 모두 소진되었습니다.');
@@ -209,7 +256,7 @@ export default {
         });
 
         alert(response.data.message);
-        this.availableTime += hours * 3600; // 충전된 시간을 초 단위로 추가
+        this.availableTime += hours * 3600;
         this.showTimeChargePopup = false;
       } catch (error) {
         console.error('시간 충전 오류:', error);
@@ -221,16 +268,69 @@ export default {
     this.fetchUserInfo();
     this.fetchMenus();
     this.startTimer();
+    
+    // F5 키 이벤트 리스너 추가
+    window.addEventListener('keydown', this.handleF5);
+    
+    // 브라우저 새로고침 방지
+    window.addEventListener('beforeunload', (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    });
+
+    // 브라우저 뒤로가기 방지
+    this.preventBrowserBack();
   },
   beforeUnmount() {
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
     }
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    
+    // F5 키 이벤트 리스너 제거
+    window.removeEventListener('keydown', this.handleF5);
+    
+    // 브라우저 뒤로가기 이벤트 제거
+    window.onpopstate = null;
   }
 }
 </script>
 
 <style scoped>
+.time-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: fadeInOut 10s forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}
+
 .header {
   display: flex;
   justify-content: space-between;
