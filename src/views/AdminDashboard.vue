@@ -21,6 +21,13 @@
               {{ pendingOrders.length }}
             </span>
           </button>
+          <button 
+            class="tab-button"
+            :class="{ active: currentTab === 'seats' }"
+            @click="currentTab = 'seats'"
+          >
+            좌석 관리
+          </button>
         </div>
         <div class="user-info">
           <span>관리자 {{ adminName }} 님</span>
@@ -31,17 +38,22 @@
 
     <!-- 알림 팝업 -->
     <div class="notifications">
-  <div v-for="notification in notifications" 
-       :key="notification.id" 
-       class="notification"
-       :style="{ top: notification.position + 'px' }">
-    새로운 주문이 {{ notification.count }}건 들어왔습니다!
-  </div>
-</div>
+      <div v-for="notification in notifications" 
+           :key="notification.id" 
+           class="notification"
+           :style="{ top: notification.position + 'px' }">
+        새로운 주문이 {{ notification.count }}건 들어왔습니다!
+      </div>
+    </div>
 
     <div class="container">
+      <SeatManagement 
+        v-if="currentTab === 'seats'"
+        :seats="seats"
+        @refresh-seats="fetchSeats"
+      />
       <MenuManagement 
-        v-if="currentTab === 'menu'"
+        v-else-if="currentTab === 'menu'"
         :menus="menus"
         @refresh-menus="fetchMenus"
       />
@@ -58,20 +70,24 @@
 import axios from 'axios'
 import MenuManagement from '@/components/admin/MenuManagement.vue'
 import OrderManagement from '@/components/admin/OrderManagement.vue'
+import SeatManagement from '@/components/admin/SeatManagement.vue'
 
 export default {
   name: 'AdminDashboard',
   components: {
     MenuManagement,
-    OrderManagement
+    OrderManagement,
+    SeatManagement
   },
   data() {
     return {
-      currentTab: 'menu',
+      currentTab: 'seats',
       adminName: '',
       menus: [],
       orders: [],
+      seats: [],
       orderRefreshInterval: null,
+      seatRefreshInterval: null,
       notifications: [],
       notificationId: 0,
       previousOrderCount: 0
@@ -132,6 +148,20 @@ export default {
         this.handleAuthError(error);
       }
     },
+    async fetchSeats() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/admin/seats', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        this.seats = response.data;
+      } catch (error) {
+        console.error('좌석 정보 로드 실패:', error);
+        this.handleAuthError(error);
+      }
+    },
     showNotification(count) {
       const notification = {
         id: this.notificationId++,
@@ -155,6 +185,13 @@ export default {
         this.fetchOrders();
       }, 3000);
     },
+    startSeatRefresh() {
+    this.seatRefreshInterval = setInterval(() => {
+      if (this.currentTab === 'seats') {
+        this.fetchSeats();
+      }
+    }, 2000); // 2초마다 갱신
+    },
     handleAuthError(error) {
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
@@ -171,6 +208,8 @@ export default {
     currentTab(newTab) {
       if (newTab === 'orders') {
         this.fetchOrders();
+      } else if (newTab === 'seats') {
+        this.fetchSeats();
       }
     }
   },
@@ -178,11 +217,16 @@ export default {
     this.fetchAdminInfo();
     this.fetchMenus();
     this.fetchOrders();
+    this.fetchSeats();
     this.startOrderRefresh();
+    this.startSeatRefresh();
   },
   beforeUnmount() {
     if (this.orderRefreshInterval) {
       clearInterval(this.orderRefreshInterval);
+    }
+    if (this.seatRefreshInterval) {
+      clearInterval(this.seatRefreshInterval);
     }
   }
 }
