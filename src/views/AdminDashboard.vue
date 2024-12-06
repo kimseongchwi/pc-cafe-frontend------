@@ -7,14 +7,14 @@
           <button 
             class="tab-button"
             :class="{ active: currentTab === 'menu' }"
-            @click="currentTab = 'menu'"
+            @click="setTab('menu')"
           >
             메뉴 관리
           </button>
           <button 
             class="tab-button"
             :class="{ active: currentTab === 'orders' }"
-            @click="currentTab = 'orders'"
+            @click="setTab('orders')"
           >
             주문 관리
             <span v-if="pendingOrders.length" class="order-badge">
@@ -24,14 +24,14 @@
           <button 
             class="tab-button"
             :class="{ active: currentTab === 'seats' }"
-            @click="currentTab = 'seats'"
+            @click="setTab('seats')"
           >
             좌석 관리
           </button>
           <button 
             class="tab-button"
             :class="{ active: currentTab === 'users' }"
-            @click="currentTab = 'users'"
+            @click="setTab('users')"
           >
             사용자 관리
           </button>
@@ -96,7 +96,7 @@ export default {
   },
   data() {
     return {
-      currentTab: 'seats',
+      currentTab: 'seats', // 기본 탭 설정
       adminName: '',
       menus: [],
       orders: [],
@@ -115,6 +115,10 @@ export default {
     }
   },
   methods: {
+    setTab(tab) {
+      this.currentTab = tab;
+      this.$router.push({ query: { tab } }); // URL 쿼리 파라미터 업데이트
+    },
     async fetchAdminInfo() {
       try {
         const token = sessionStorage.getItem('token');
@@ -265,6 +269,10 @@ export default {
     }
   },
   mounted() {
+    const tab = this.$route.query.tab;
+    if (tab) {
+      this.currentTab = tab; // URL 쿼리 파라미터에 따라 탭 설정
+    }
     this.fetchAdminInfo();
     this.fetchMenus();
     this.fetchOrders();
