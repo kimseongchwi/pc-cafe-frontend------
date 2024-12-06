@@ -24,14 +24,14 @@
         <button 
           class="tab-button"
           :class="{ active: currentTab === 'order' }"
-          @click="currentTab = 'order'"
+          @click="setTab('order')"
         >
           메뉴주문
         </button>
         <button 
           class="tab-button"
           :class="{ active: currentTab === 'history' }"
-          @click="fetchOrders; currentTab = 'history'"
+          @click="setTab('history'); fetchOrders()"
         >
           주문내역 <span v-if="orders.length > 0">({{ orders.length }})</span>
         </button>
@@ -87,6 +87,7 @@
         <button @click="showPasswordChangePopup = false" class="button">취소</button>
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -140,6 +141,10 @@ export default {
     }
   },
   methods: {
+    setTab(tab) {
+      this.currentTab = tab;
+      this.$router.push({ query: { tab } }); // URL 쿼리 파라미터 업데이트
+    },
     handleF5(event) {
       if (event.key === 'F5' || (event.ctrlKey && event.key === 'r')) {
         event.preventDefault();
@@ -265,57 +270,61 @@ export default {
       }, 1000);
     },
     async chargeTime(hours) {
-  try {
-    const token = sessionStorage.getItem('token');
-    const response = await axios.post('/api/time-charge', {
-      hours,
-      paymentMethod: this.selectedPaymentMethod
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.post('/api/time-charge', {
+          hours,
+          paymentMethod: this.selectedPaymentMethod
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.data && response.data.message) {
+          alert(response.data.message);
+        }
+
+        this.availableTime += hours * 3600;
+        this.showTimeChargePopup = false;
+      } catch (error) {
+        console.error('시간 충전 실패:', error);
+        alert('시간 충전에 실패했습니다.');
       }
-    });
-
-    if (response.data && response.data.message) {
-      alert(response.data.message);
-    }
-
-    this.availableTime += hours * 3600;
-    this.showTimeChargePopup = false;
-  } catch (error) {
-    console.error('시간 충전 실패:', error);
-    alert('시간 충전에 실패했습니다.');
-  }
-},
+    },
     async changePassword() {
-  if (this.newPassword !== this.confirmNewPassword) {
-    alert('새 비밀번호가 일치하지 않습니다.');
-    return;
-  }
-
-  try {
-    const token = sessionStorage.getItem('token');
-    await axios.post('/api/users/change-password', {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+      if (this.newPassword !== this.confirmNewPassword) {
+        alert('새 비밀번호가 일치하지 않습니다.');
+        return;
       }
-    });
 
-    alert('비밀번호가 변경 완료되었습니다.');
-    this.showPasswordChangePopup = false;
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmNewPassword = '';
-  } catch (error) {
-    console.error('비밀번호 변경 실패:', error);
-    alert('비밀번호 변경에 실패했습니다.');
-  }
-}
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.post('/api/users/change-password', {
+          currentPassword: this.currentPassword,
+          newPassword: this.newPassword
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        alert('비밀번호가 변경 완료되었습니다.');
+        this.showPasswordChangePopup = false;
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmNewPassword = '';
+      } catch (error) {
+        console.error('비밀번호 변경 실패:', error);
+        alert('비밀번호 변경에 실패했습니다.');
+      }
+    }
   },
   mounted() {
+    const tab = this.$route.query.tab;
+    if (tab) {
+      this.currentTab = tab; // URL 쿼리 파라미터에 따라 탭 설정
+    }
     this.fetchUserInfo();
     this.fetchMenus();
     this.fetchOrders();
