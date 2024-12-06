@@ -7,7 +7,7 @@
             <th>이름</th>
             <th>아이디</th>
             <th>가입 날짜</th>
-            <th>역할</th>
+            <th>유형</th>
             <th>남은 시간</th>
             <th>비밀번호 초기화</th>
           </tr>
@@ -38,13 +38,18 @@
       }
     },
     computed: {
-      filteredUsers() {
-        return this.users.filter(user => 
-          user.name.includes(this.searchQuery) || 
-          user.registerid.includes(this.searchQuery)
-        );
-      }
-    },
+  filteredUsers() {
+    return this.users.filter(user => 
+      user.name.includes(this.searchQuery) || 
+      user.registerid.includes(this.searchQuery)
+    ).map(user => {
+      return {
+        ...user,
+        role: user.role === 'user' ? '사용자' : user.role
+      };
+    });
+  }
+},
     methods: {
       formatDate(dateString) {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };

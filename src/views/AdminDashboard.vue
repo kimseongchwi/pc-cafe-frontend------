@@ -197,7 +197,7 @@ export default {
       }
     },
     async resetPassword(userId) {
-      const adminCode = prompt('정말 초기화 시키겠습니까? 관리자 번호를 입력하세요(admin123)');
+      const adminCode = prompt('정말 초기화 시키겠습니까? 관리자 번호를 입력하세요');
       if (adminCode === 'admin123') {
         try {
           const token = sessionStorage.getItem('token');
