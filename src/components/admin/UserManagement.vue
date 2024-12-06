@@ -1,6 +1,6 @@
 <template>
     <div class="user-management">
-      <input v-model="searchQuery" placeholder="사용자 검색" class="search-input" />
+      <input v-model="searchQuery" placeholder="이름 또는 아이디 검색" class="search-input" />
       <table class="user-table">
         <thead>
           <tr>
@@ -33,7 +33,8 @@
     props: ['users'],
     data() {
       return {
-        searchQuery: ''
+        searchQuery: '',
+        refreshInterval: null, // 새로고침 간격을 저장할 변수 추가
       }
     },
     computed: {
@@ -53,7 +54,17 @@
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         return `${hours}시간 ${minutes}분`;
+      },
+      refreshUsers() {
+        // 사용자 목록을 새로고침하는 로직을 여기에 추가
+        this.$emit('refresh-users'); // 부모 컴포넌트에서 사용자 목록을 갱신하도록 이벤트 발생
       }
+    },
+    mounted() {
+      this.refreshInterval = setInterval(this.refreshUsers, 2000); // 2초마다 refreshUsers 호출
+    },
+    beforeUnmount() {
+      clearInterval(this.refreshInterval); // 컴포넌트가 파괴되기 전에 인터벌 제거
     }
   }
   </script>

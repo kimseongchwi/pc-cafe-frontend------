@@ -131,11 +131,11 @@ export default {
       }
     },
     formatTime(seconds) {
-    if (!seconds) return '0분';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
-  },
+      if (!seconds) return '0분';
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+    },
     selectSeat(seatNumber) {
       const seat = this.seats.find(s => s.number === seatNumber);
       if (seat && seat.registerid) {
@@ -322,7 +322,7 @@ body {
 
 .seat-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(7, 1fr); /* 7개의 열로 설정 */
     gap: 16px;
     margin-top: 1.5rem;
 }
