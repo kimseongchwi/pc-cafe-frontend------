@@ -13,7 +13,7 @@
           <span>{{ name }} 님</span>
           <span class="time-remaining">{{ formattedTime }}</span>
           <button @click="showTimeChargePopup = true" class="charge-button">시간 충전</button>
-          <button @click="logout" class="logout-button">사용종료</button>
+          <button @click="confirmLogout" class="logout-button">사용종료</button>
           <button @click="showPasswordChangePopup = true" class="change-password-button">비밀번호 변경</button>
         </div>
       </div>
@@ -87,6 +87,20 @@
         <button @click="showPasswordChangePopup = false" class="button">취소</button>
       </div>
     </div>
+
+    <!-- 로그아웃 확인 팝업 -->
+    <div v-if="showLogoutPopup" class="logout-popup">
+      <h2>사용을 종료하시겠습니까?</h2>
+      <div class="modal-buttons">
+        <button @click="logout" class="button button-primary">예 ({{ logoutCountdown }})</button>
+        <button @click="cancelLogout" class="button">취소</button>
+      </div>
+    </div>
+
+    <!-- 로그아웃 메시지 -->
+    <div v-if="showLogoutMessage" class="logout-message">
+      사용 종료되었습니다. 방문해주셔서 감사합니다.
+    </div>
     
   </div>
 </template>
@@ -130,6 +144,10 @@ export default {
       currentPassword: '',
       newPassword: '',
       confirmNewPassword: '',
+      showLogoutPopup: false,
+      logoutCountdown: 5,
+      logoutTimeout: null,
+      showLogoutMessage: false // 로그아웃 메시지 표시 여부
     }
   },
   computed: {
@@ -222,6 +240,24 @@ export default {
         this.logout();
       }
     },
+    confirmLogout() {
+      this.showLogoutPopup = true;
+      this.logoutCountdown = 5;
+      this.logoutTimeout = setInterval(() => {
+        if (this.logoutCountdown > 0) {
+          this.logoutCountdown--;
+        } else {
+          clearInterval(this.logoutTimeout);
+          this.logout();
+        }
+      }, 1000);
+    },
+    cancelLogout() {
+      this.showLogoutPopup = false;
+      if (this.logoutTimeout) {
+        clearInterval(this.logoutTimeout);
+      }
+    },
     async logout() {
       try {
         const token = sessionStorage.getItem('token');
@@ -248,7 +284,12 @@ export default {
         sessionStorage.removeItem('userRole');
         sessionStorage.removeItem('userName');
         sessionStorage.removeItem('seatNumber');
-        this.$router.push('/');
+        
+        // 메시지를 표시하고 2초 후에 홈페이지로 이동
+        this.showLogoutMessage = true;
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 2000);
       }
     },
     startTimer() {
@@ -341,6 +382,9 @@ export default {
     }
     if (this.notificationTimeout) {
       clearTimeout(this.notificationTimeout);
+    }
+    if (this.logoutTimeout) {
+      clearInterval(this.logoutTimeout);
     }
     window.removeEventListener('keydown', this.handleF5);
   }
@@ -482,7 +526,7 @@ export default {
   background-color: #f0f0f0;
 }
 
-.time-charge-popup, .password-change-popup {
+.time-charge-popup, .password-change-popup, .logout-popup {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -546,6 +590,20 @@ export default {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.logout-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #333;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 1000;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
