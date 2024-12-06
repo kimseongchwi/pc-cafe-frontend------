@@ -28,6 +28,13 @@
           >
             좌석 관리
           </button>
+          <button 
+            class="tab-button"
+            :class="{ active: currentTab === 'users' }"
+            @click="currentTab = 'users'"
+          >
+            사용자 관리
+          </button>
         </div>
         <div class="user-info">
           <span>관리자 {{ adminName }} 님</span>
@@ -58,9 +65,15 @@
         @refresh-menus="fetchMenus"
       />
       <OrderManagement 
-        v-else
+        v-else-if="currentTab === 'orders'"
         :orders="orders"
         @refresh-orders="fetchOrders"
+      />
+      <UserManagement 
+        v-else
+        :users="users"
+        @refresh-users="fetchUsers"
+        @reset-password="resetPassword"
       />
     </div>
   </div>
@@ -71,13 +84,15 @@ import axios from 'axios'
 import MenuManagement from '@/components/admin/MenuManagement.vue'
 import OrderManagement from '@/components/admin/OrderManagement.vue'
 import SeatManagement from '@/components/admin/SeatManagement.vue'
+import UserManagement from '@/components/admin/UserManagement.vue'
 
 export default {
   name: 'AdminDashboard',
   components: {
     MenuManagement,
     OrderManagement,
-    SeatManagement
+    SeatManagement,
+    UserManagement
   },
   data() {
     return {
@@ -86,6 +101,7 @@ export default {
       menus: [],
       orders: [],
       seats: [],
+      users: [],
       orderRefreshInterval: null,
       seatRefreshInterval: null,
       notifications: [],
@@ -162,6 +178,39 @@ export default {
         this.handleAuthError(error);
       }
     },
+    async fetchUsers() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/users', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        this.users = response.data.filter(user => user.role !== 'admin');
+      } catch (error) {
+        console.error('사용자 목록 로드 실패:', error);
+        this.handleAuthError(error);
+      }
+    },
+    async resetPassword(userId) {
+      const adminCode = prompt('정말 초기화 시키겠습니까? 관리자 번호를 입력하세요(admin123)');
+      if (adminCode === 'admin123') {
+        try {
+          const token = sessionStorage.getItem('token');
+          await axios.post(`/api/users/${userId}/reset-password`, {}, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          alert('초기화되었습니다. 비밀번호는 1111입니다.');
+        } catch (error) {
+          console.error('비밀번호 초기화 실패:', error);
+          this.handleAuthError(error);
+        }
+      } else {
+        alert('잘못된 관리자 번호입니다.');
+      }
+    },
     showNotification(count) {
       const notification = {
         id: this.notificationId++,
@@ -186,11 +235,11 @@ export default {
       }, 3000);
     },
     startSeatRefresh() {
-    this.seatRefreshInterval = setInterval(() => {
-      if (this.currentTab === 'seats') {
-        this.fetchSeats();
-      }
-    }, 2000); // 2초마다 갱신
+      this.seatRefreshInterval = setInterval(() => {
+        if (this.currentTab === 'seats') {
+          this.fetchSeats();
+        }
+      }, 2000); // 2초마다 갱신
     },
     handleAuthError(error) {
       if (error.response?.status === 401) {
@@ -210,6 +259,8 @@ export default {
         this.fetchOrders();
       } else if (newTab === 'seats') {
         this.fetchSeats();
+      } else if (newTab === 'users') {
+        this.fetchUsers();
       }
     }
   },
@@ -218,6 +269,7 @@ export default {
     this.fetchMenus();
     this.fetchOrders();
     this.fetchSeats();
+    this.fetchUsers();
     this.startOrderRefresh();
     this.startSeatRefresh();
   },

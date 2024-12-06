@@ -14,6 +14,7 @@
           <span class="time-remaining">{{ formattedTime }}</span>
           <button @click="showTimeChargePopup = true" class="charge-button">시간 충전</button>
           <button @click="logout" class="logout-button">사용종료</button>
+          <button @click="showPasswordChangePopup = true" class="change-password-button">비밀번호 변경</button>
         </div>
       </div>
     </header>
@@ -65,6 +66,27 @@
       </div>
       <button @click="showTimeChargePopup = false" class="close-popup">닫기</button>
     </div>
+
+    <!-- 비밀번호 변경 팝업 -->
+    <div v-if="showPasswordChangePopup" class="password-change-popup">
+      <h2>비밀번호 변경</h2>
+      <div class="form-group">
+        <label>현재 비밀번호</label>
+        <input type="password" v-model="currentPassword" class="input" />
+      </div>
+      <div class="form-group">
+        <label>새 비밀번호</label>
+        <input type="password" v-model="newPassword" class="input" />
+      </div>
+      <div class="form-group">
+        <label>새 비밀번호 재입력</label>
+        <input type="password" v-model="confirmNewPassword" class="input" />
+      </div>
+      <div class="modal-buttons">
+        <button @click="changePassword" class="button button-primary">변경</button>
+        <button @click="showPasswordChangePopup = false" class="button">취소</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -103,6 +125,10 @@ export default {
       showTimeNotification: false,
       timeNotificationMessage: '',
       notificationTimeout: null,
+      showPasswordChangePopup: false,
+      currentPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
     }
   },
   computed: {
@@ -114,22 +140,18 @@ export default {
     }
   },
   methods: {
-    // F5 키 이벤트 핸들러 추가
     handleF5(event) {
       if (event.key === 'F5' || (event.ctrlKey && event.key === 'r')) {
         event.preventDefault();
         return false;
       }
     },
-
-    // 브라우저 뒤로가기 방지
     preventBrowserBack() {
       history.pushState(null, '', location.href);
       window.onpopstate = () => {
         history.pushState(null, '', location.href);
       };
     },
-
     showNotification(minutes) {
       this.timeNotificationMessage = minutes;
       this.showTimeNotification = true;
@@ -142,7 +164,6 @@ export default {
         this.showTimeNotification = false;
       }, 10000);
     },
-
     async fetchUserInfo() {
       try {
         const token = sessionStorage.getItem('token');
@@ -246,7 +267,7 @@ export default {
     async chargeTime(hours) {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.post('/api/time-charge', {
+        await axios.post('/api/users/charge-time', {
           hours,
           paymentMethod: this.selectedPaymentMethod
         }, {
@@ -254,46 +275,60 @@ export default {
             'Authorization': `Bearer ${token}`
           }
         });
-
-        alert(response.data.message);
         this.availableTime += hours * 3600;
         this.showTimeChargePopup = false;
       } catch (error) {
-        console.error('시간 충전 오류:', error);
+        console.error('시간 충전 실패:', error);
         alert('시간 충전에 실패했습니다.');
       }
-    }
+    },
+    async changePassword() {
+  if (this.newPassword !== this.confirmNewPassword) {
+    alert('새 비밀번호가 일치하지 않습니다.');
+    return;
+  }
+
+  try {
+    const token = sessionStorage.getItem('token');
+    await axios.post('/api/users/change-password', {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    alert('비밀번호가 변경 완료되었습니다.');
+    this.showPasswordChangePopup = false;
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.confirmNewPassword = '';
+  } catch (error) {
+    console.error('비밀번호 변경 실패:', error);
+    alert('비밀번호 변경에 실패했습니다.');
+  }
+}
   },
   mounted() {
     this.fetchUserInfo();
     this.fetchMenus();
+    this.fetchOrders();
     this.startTimer();
-    
-    // F5 키 이벤트 리스너 추가
     window.addEventListener('keydown', this.handleF5);
-    
-    // 브라우저 새로고침 방지
-    window.addEventListener('beforeunload', (event) => {
-      event.preventDefault();
-      event.returnValue = '';
-    });
-
-    // 브라우저 뒤로가기 방지
     this.preventBrowserBack();
   },
   beforeUnmount() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
     }
     if (this.notificationTimeout) {
       clearTimeout(this.notificationTimeout);
     }
-    
-    // F5 키 이벤트 리스너 제거
     window.removeEventListener('keydown', this.handleF5);
-    
-    // 브라우저 뒤로가기 이벤트 제거
-    window.onpopstate = null;
   }
 }
 </script>
@@ -301,13 +336,14 @@ export default {
 <style scoped>
 .time-notification {
   position: fixed;
-  top: 20px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #ff9800;
   color: white;
-  padding: 10px 20px;
+  padding: 1rem;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   z-index: 1000;
   animation: fadeInOut 10s forwards;
 }
@@ -381,7 +417,7 @@ export default {
   border-radius: 4px;
 }
 
-.charge-button, .logout-button {
+.charge-button, .logout-button, .change-password-button {
   padding: 0.5rem 1rem;
   border: 1px solid white;
   border-radius: 4px;
@@ -392,7 +428,7 @@ export default {
   font-size: 0.9rem;
 }
 
-.charge-button:hover, .logout-button:hover {
+.charge-button:hover, .logout-button:hover, .change-password-button:hover {
   background-color: white;
   color: #333;
 }
@@ -432,7 +468,7 @@ export default {
   background-color: #f0f0f0;
 }
 
-.time-charge-popup {
+.time-charge-popup, .password-change-popup {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -477,6 +513,25 @@ export default {
 
 .close-popup:hover {
   background-color: #ddd;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 @media (max-width: 768px) {

@@ -279,7 +279,7 @@ export default {
     },
     startEdit(menu) {
       this.editingMenu = { ...menu };
-      this.editImagePreview = menu.imageUrl;
+      this.editImagePreview = menu.imageUrl || '/placeholder-menu.png'; // 기본 이미지 설정
     },
     async updateMenu() {
       if (!this.editingMenu.name || !this.editingMenu.price) {
@@ -501,4 +501,4 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
-</style> 
+</style>
