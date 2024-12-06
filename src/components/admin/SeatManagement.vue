@@ -108,6 +108,11 @@ export default {
       this.selectedSeat = seat;
     },
     async forceLogout() {
+      const confirmation = confirm('강제 로그아웃하시겠습니까?');
+  
+  if (!confirmation) {
+    return; // 사용자가 취소를 선택한 경우
+  }
       try {
         const response = await axios.post(`/api/admin/force-logout/${this.selectedSeat.number}`, {}, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
@@ -116,6 +121,7 @@ export default {
         if (response.data.success) {
           this.$emit('refresh-seats');
           this.showMenu = false;
+          alert('강제 로그아웃을 완료하였습니다.');
         }
       } catch (error) {
         console.error('강제 로그아웃 실패:', error);
@@ -134,6 +140,7 @@ export default {
           this.$emit('refresh-seats');
           this.showTimeChargePopup = false;
           this.showMenu = false;
+          alert(`${hours}시간을 충전하였습니다.`);
         }
       } catch (error) {
         console.error('시간 충전 실패:', error);
@@ -157,6 +164,7 @@ export default {
           this.$emit('refresh-seats');
           this.showTimeRemovePopup = false;
           this.showMenu = false;
+          alert(`${this.removeTimeAmount}분을 제거하였습니다.`);
           this.removeTimeAmount = '';
         }
       } catch (error) {

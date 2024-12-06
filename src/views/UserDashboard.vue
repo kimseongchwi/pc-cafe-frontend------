@@ -265,23 +265,28 @@ export default {
       }, 1000);
     },
     async chargeTime(hours) {
-      try {
-        const token = sessionStorage.getItem('token');
-        await axios.post('/api/users/charge-time', {
-          hours,
-          paymentMethod: this.selectedPaymentMethod
-        }, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        this.availableTime += hours * 3600;
-        this.showTimeChargePopup = false;
-      } catch (error) {
-        console.error('시간 충전 실패:', error);
-        alert('시간 충전에 실패했습니다.');
+  try {
+    const token = sessionStorage.getItem('token');
+    const response = await axios.post('/api/time-charge', {
+      hours,
+      paymentMethod: this.selectedPaymentMethod
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-    },
+    });
+
+    if (response.data && response.data.message) {
+      alert(response.data.message);
+    }
+
+    this.availableTime += hours * 3600;
+    this.showTimeChargePopup = false;
+  } catch (error) {
+    console.error('시간 충전 실패:', error);
+    alert('시간 충전에 실패했습니다.');
+  }
+},
     async changePassword() {
   if (this.newPassword !== this.confirmNewPassword) {
     alert('새 비밀번호가 일치하지 않습니다.');
