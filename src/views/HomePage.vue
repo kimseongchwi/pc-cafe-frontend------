@@ -259,6 +259,12 @@ export default {
         sessionStorage.removeItem('seatNumber');
       }
     }
+    // 2초마다 좌석 정보 업데이트
+    this.seatUpdateInterval = setInterval(this.fetchSeats, 2000);
+  },
+  beforeUnmount() {
+    // 컴포넌트가 언마운트될 때 인터벌 제거
+    clearInterval(this.seatUpdateInterval);
   }
 }
 </script>

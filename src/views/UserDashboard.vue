@@ -372,6 +372,9 @@ export default {
     this.startTimer();
     window.addEventListener('keydown', this.handleF5);
     this.preventBrowserBack();
+
+   // 1초마다 사용자 정보 업데이트
+   this.userInfoUpdateInterval = setInterval(this.fetchUserInfo, 1000);
   },
   beforeUnmount() {
     if (this.refreshInterval) {
@@ -386,6 +389,7 @@ export default {
     if (this.logoutTimeout) {
       clearInterval(this.logoutTimeout);
     }
+    clearInterval(this.userInfoUpdateInterval); // 인터벌 제거
     window.removeEventListener('keydown', this.handleF5);
   }
 }
