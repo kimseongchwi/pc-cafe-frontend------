@@ -47,12 +47,30 @@
         </div>
 
         <div class="form-group">
-          <label>주소 (선택)</label>
-          <input 
-            v-model="form.address" 
-            type="text"
-            placeholder="주소를 입력하세요"
-          >
+          <label>전화번호</label>
+          <div class="phone-number-input">
+            <input 
+              v-model="form.phoneNumberPart1" 
+              type="text" 
+              required
+              maxlength="3"
+              readonly
+            >
+            <span>-</span>
+            <input 
+              v-model="form.phoneNumberPart2" 
+              type="text" 
+              required
+              maxlength="4"
+            >
+            <span>-</span>
+            <input 
+              v-model="form.phoneNumberPart3" 
+              type="text" 
+              required
+              maxlength="4"
+            >
+          </div>
         </div>
 
         <div class="form-group">
@@ -90,7 +108,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   name: 'RegisterPage',
@@ -100,7 +118,9 @@ export default {
         registerid: '',
         password: '',
         name: '',
-        address: '',
+        phoneNumberPart1: '010',
+        phoneNumberPart2: '',
+        phoneNumberPart3: '',
         role: 'user',
         adminCode: ''
       },
@@ -116,6 +136,9 @@ export default {
              this.isRegisteridValid &&
              this.form.password && 
              this.form.name &&
+             this.form.phoneNumberPart1 &&
+             this.form.phoneNumberPart2 &&
+             this.form.phoneNumberPart3 &&
              (this.form.role !== 'admin' || this.form.adminCode);
     }
   },
@@ -160,8 +183,13 @@ export default {
         return;
       }
 
+      const phone_number = `${this.form.phoneNumberPart1}-${this.form.phoneNumberPart2}-${this.form.phoneNumberPart3}`;
+
       try {
-        await axios.post('http://localhost:3000/api/auth/register', this.form);
+        await axios.post('http://localhost:3000/api/auth/register', {
+          ...this.form,
+          phone_number
+        });
         alert('회원가입이 완료되었습니다.');
         this.$router.push('/');
       } catch (error) {
@@ -206,6 +234,17 @@ export default {
 .registerid-input {
   display: flex;
   gap: 0.5rem;
+}
+
+.phone-number-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.phone-number-input input {
+  width: 98px;
+  text-align: center;
 }
 
 .button {
