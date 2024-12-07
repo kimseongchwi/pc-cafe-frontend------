@@ -148,25 +148,25 @@ export default {
       }
     },
     async fetchOrders() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const response = await axios.get('/api/orders', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        // 새 주문이 있는지 확인
-        if (this.previousOrderCount !== 0 && response.data.length > this.previousOrderCount) {
-          const newOrderCount = response.data.length - this.previousOrderCount;
-          this.showNotification(newOrderCount);
+        try {
+            const token = sessionStorage.getItem('token');
+            const response = await axios.get('/api/orders', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            // 새 주문이 있는지 확인
+            const newOrderCount = response.data.length - this.previousOrderCount;
+            if (newOrderCount > 0) {
+                this.showNotification(newOrderCount);
+            }
+            this.previousOrderCount = response.data.length;
+            this.orders = response.data;
+        } catch (error) {
+            console.error('주문 목록 로드 실패:', error);
+            this.handleAuthError(error);
         }
-        this.previousOrderCount = response.data.length;
-        this.orders = response.data;
-      } catch (error) {
-        console.error('주문 목록 로드 실패:', error);
-        this.handleAuthError(error);
-      }
     },
     async fetchSeats() {
       try {
