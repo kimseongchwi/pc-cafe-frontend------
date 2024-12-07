@@ -11,6 +11,7 @@
         <div class="seat-info" v-if="seat.registerid">
           <div class="user-name">{{ seat.user_name }}</div>
           <div class="remaining-time">{{ formatTime(seat.available_time) }}</div>
+          <div class="start-time">{{ formatStartTime(seat.start_time) }}</div> <!-- 시작 시간 표시 -->
         </div>
         <span v-else class="status">빈좌석</span>
       </div>
@@ -98,6 +99,16 @@ export default {
       const minutes = Math.floor((seconds % 3600) / 60);
       return hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
     },
+    formatStartTime(startTime) {
+      if (!startTime) return '';
+      const date = new Date(startTime);
+      const yy = String(date.getFullYear()).slice(-2);
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const ss = String(date.getMinutes()).padStart(2, '0');
+      return `${yy}${mm}${dd}-${hh}:${ss}`;
+    },
     showContextMenu(event, seat) {
       if (!seat.registerid) return;
       
@@ -110,9 +121,9 @@ export default {
     async forceLogout() {
       const confirmation = confirm('강제 로그아웃하시겠습니까?');
   
-  if (!confirmation) {
-    return; // 사용자가 취소를 선택한 경우
-  }
+      if (!confirmation) {
+        return; // 사용자가 취소를 선택한 경우
+      }
       try {
         const response = await axios.post(`/api/admin/force-logout/${this.selectedSeat.number}`, {}, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
@@ -245,6 +256,11 @@ export default {
 
 .remaining-time {
   font-size: 12px;
+}
+
+.start-time {
+  font-size: 10px;
+  color: white;
 }
 
 .status {
