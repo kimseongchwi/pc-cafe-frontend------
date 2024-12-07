@@ -21,7 +21,6 @@
     <div v-if="showMenu" 
          class="context-menu"
          :style="{ top: menuY + 'px', left: menuX + 'px' }">
-      <div class="menu-item" @click="forceLogout">강제 로그아웃</div>
       <div class="menu-item" @click="showTimeChargePopup = true">시간 충전</div>
       <div class="menu-item" @click="showTimeRemovePopup = true">시간 제거</div>
     </div>
@@ -118,27 +117,6 @@ export default {
       this.menuY = event.clientY;
       this.selectedSeat = seat;
     },
-    async forceLogout() {
-      const confirmation = confirm('강제 로그아웃하시겠습니까?');
-  
-      if (!confirmation) {
-        return; // 사용자가 취소를 선택한 경우
-      }
-      try {
-        const response = await axios.post(`/api/admin/force-logout/${this.selectedSeat.number}`, {}, {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
-        });
-        
-        if (response.data.success) {
-          this.$emit('refresh-seats');
-          this.showMenu = false;
-          alert('강제 로그아웃을 완료하였습니다.');
-        }
-      } catch (error) {
-        console.error('강제 로그아웃 실패:', error);
-        alert('강제 로그아웃에 실패했습니다.');
-      }
-    },
     async chargeTime(hours) {
       try {
         const response = await axios.post(`/api/admin/charge-time/${this.selectedSeat.number}`, {
@@ -170,30 +148,18 @@ export default {
         }, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         });
-        
+
         if (response.data.success) {
           this.$emit('refresh-seats');
           this.showTimeRemovePopup = false;
           this.showMenu = false;
           alert(`${this.removeTimeAmount}분을 제거하였습니다.`);
-          this.removeTimeAmount = '';
         }
       } catch (error) {
         console.error('시간 제거 실패:', error);
         alert('시간 제거에 실패했습니다.');
       }
     }
-  },
-  mounted() {
-    // 컨텍스트 메뉴 외부 클릭 시 닫기
-    this.clickHandler = () => {
-      this.showMenu = false;
-    };
-    document.addEventListener('click', this.clickHandler);
-  },
-  beforeUnmount() {
-    // 이벤트 리스너 제거
-    document.removeEventListener('click', this.clickHandler);
   }
 }
 </script>

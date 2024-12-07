@@ -101,7 +101,6 @@
     <div v-if="showLogoutMessage" class="logout-message">
       사용 종료되었습니다. 방문해주셔서 감사합니다.
     </div>
-    
   </div>
 </template>
 
@@ -373,8 +372,8 @@ export default {
     window.addEventListener('keydown', this.handleF5);
     this.preventBrowserBack();
 
-   // 1초마다 사용자 정보 업데이트
-   this.userInfoUpdateInterval = setInterval(this.fetchUserInfo, 1000);
+    // 1초마다 사용자 정보 업데이트
+    this.userInfoUpdateInterval = setInterval(this.fetchUserInfo, 1000);
   },
   beforeUnmount() {
     if (this.refreshInterval) {
