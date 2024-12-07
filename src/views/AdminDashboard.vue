@@ -106,7 +106,8 @@ export default {
       seatRefreshInterval: null,
       notifications: [],
       notificationId: 0,
-      previousOrderCount: 0
+      previousOrderCount: 0,
+      initialLoad: true // 초기 로드 여부 확인
     }
   },
   computed: {
@@ -148,25 +149,32 @@ export default {
       }
     },
     async fetchOrders() {
-        try {
-            const token = sessionStorage.getItem('token');
-            const response = await axios.get('/api/orders', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            // 새 주문이 있는지 확인
-            const newOrderCount = response.data.length - this.previousOrderCount;
-            if (newOrderCount > 0) {
-                this.showNotification(newOrderCount);
-            }
-            this.previousOrderCount = response.data.length;
-            this.orders = response.data;
-        } catch (error) {
-            console.error('주문 목록 로드 실패:', error);
-            this.handleAuthError(error);
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        // 초기 로드가 아닐 때만 새 주문 확인
+        if (!this.initialLoad) {
+          const newPendingOrders = response.data.filter(order => order.status === 'pending').length;
+          const newOrderCount = newPendingOrders - this.previousOrderCount;
+          if (newOrderCount > 0) {
+            this.showNotification(newOrderCount);
+          }
+          this.previousOrderCount = newPendingOrders;
+        } else {
+          this.previousOrderCount = response.data.filter(order => order.status === 'pending').length;
+          this.initialLoad = false; // 초기 로드 완료
         }
+        
+        this.orders = response.data;
+      } catch (error) {
+        console.error('주문 목록 로드 실패:', error);
+        this.handleAuthError(error);
+      }
     },
     async fetchSeats() {
       try {
