@@ -32,8 +32,7 @@
             감사합니다
           </div>
           <div v-else-if="loginError" class="message-box error">
-            가입된 아이디 또는<br>
-            비밀번호가 틀립니다
+            <div v-for="message in errorMessage" :key="message">{{ message }}</div>
           </div>
           <div v-else-if="noSeatError" class="message-box error">
             좌석이 선택되지<br>
@@ -118,7 +117,8 @@ export default {
         50: 50000,
         100: 100000
       },
-      selectedPaymentMethod: 'cash'
+      selectedPaymentMethod: 'cash',
+      errorMessage: [] // 오류 메시지 배열로 변경
     }
   },
   methods: {
@@ -156,60 +156,66 @@ export default {
       }
     },
     async handleLogin() {
-      if (!this.registerid || !this.password) {
-        this.registeridError = !this.registerid;
-        this.passwordError = !this.password;
-        return;
-      }
-
-      try {
-        const response = await axios.post('http://localhost:3000/api/auth/login', {
-          registerid: this.registerid,
-          password: this.password,
-          seatNumber: this.selectedSeat
-        });
-        
-        if (response.data.user && response.data.token) {
-          this.loginError = false;
-          this.noSeatError = false;
-          
-          if (response.data.user.role === 'admin' || this.selectedSeat) {
-            sessionStorage.setItem('token', response.data.token);
-            sessionStorage.setItem('userRole', response.data.user.role);
-            sessionStorage.setItem('userName', response.data.user.name);
-            sessionStorage.setItem('seatNumber', this.selectedSeat);
-          }
-          
-          if (response.data.user.role === 'admin') {
-            this.isAdmin = true;
-            this.$router.push('/admin');
-          } else {
-            if (!this.selectedSeat) {
-              this.noSeatError = true;
-              setTimeout(() => {
-                this.noSeatError = false;
-              }, 2000);
-              return;
-            }
-            if (response.data.user.available_time <= 0) {
-              this.showTimeChargePopup = true;
-              return;
-            }
-            this.$router.push('/user');
-          }
+        if (!this.registerid || !this.password) {
+            this.registeridError = !this.registerid;
+            this.passwordError = !this.password;
+            return;
         }
-      } catch (error) {
-        console.error('Login error:', error);
-        this.loginError = true;
-        this.registeridError = true;
-        this.passwordError = true;
 
-        setTimeout(() => {
-          this.loginError = false;
-          this.registeridError = false;
-          this.passwordError = false;
-        }, 2000);
-      }
+        try {
+            const response = await axios.post('http://localhost:3000/api/auth/login', {
+                registerid: this.registerid,
+                password: this.password,
+                seatNumber: this.selectedSeat
+            });
+
+            if (response.data.user && response.data.token) {
+                this.loginError = false;
+                this.noSeatError = false;
+
+                // 세션 스토리지에 세션 ID 저장
+                const sessionId = new Date().getTime(); // 간단한 세션 ID 생성
+                sessionStorage.setItem('sessionId', sessionId);
+
+                sessionStorage.setItem('token', response.data.token);
+                sessionStorage.setItem('userRole', response.data.user.role);
+                sessionStorage.setItem('userName', response.data.user.name);
+                sessionStorage.setItem('seatNumber', this.selectedSeat);
+
+                if (response.data.user.role === 'admin') {
+                    this.isAdmin = true;
+                    this.$router.push('/admin');
+                } else {
+                    if (!this.selectedSeat) {
+                        this.noSeatError = true;
+                        setTimeout(() => {
+                            this.noSeatError = false;
+                        }, 2000);
+                        return;
+                    }
+                    if (response.data.user.available_time <= 0) {
+                        this.showTimeChargePopup = true;
+                        return;
+                    }
+                    this.$router.push('/user');
+                }
+            }
+        } catch (error) {
+            this.loginError = true;
+            if (error.response && error.response.status === 403) {
+                // 중복 로그인 경고 메시지
+                this.errorMessage = ['중복 로그인되었습니다', '먼저 사용을 종료해주세요'];
+            } else {
+                console.error('Login error:', error);
+                this.errorMessage = ['가입된 아이디 또는', '비밀번호가 틀립니다'];
+            }
+
+            setTimeout(() => {
+                this.loginError = false;
+                this.registeridError = false;
+                this.passwordError = false;
+            }, 2000);
+        }
     },
     async chargeTime(hours) {
       try {
