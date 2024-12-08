@@ -308,10 +308,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 body {
     margin: 0;
-    background-color: #f5f5f5;
+    background-color: #f0f0f0; /* 더 어두운 바깥 배경 */
+    color: #e0e0e0; /* 텍스트 색상 */
+    font-family: 'Roboto', sans-serif;
 }
 
 .home-page {
@@ -321,15 +323,16 @@ body {
 }
 
 .header {
-    background-color: #333;
-    color: white;
+    background-color: #161b22; /* 헤더 배경 */
+    color: #58a6ff; /* 헤더 텍스트 색상 */
     padding: 1.5rem;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .header h1 {
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 2.5rem;
 }
 
 .main-container {
@@ -337,71 +340,65 @@ body {
     justify-content: center;
     gap: 2rem;
     padding: 2rem;
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
-}
-.remaining-time {
-    position: absolute;
-    top: 5px;       /* 위치 조정 */
-    right: 5px;     /* 위치 조정 */
-    font-size: 12px;
-    color: #333;
-    opacity: 0.8;
 }
 
 /* 좌석 섹션 */
 .seat-section {
     flex: 3;
-    background: white;
-    padding: 3rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #ffffff; /* 섹션 배경 */
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .seat-section h2 {
     margin-top: 0;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
+    color: #333; /* 섹션 제목 색상 */
 }
 
 .seat-container {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7개의 열로 설정 */
-    gap: 16px;
-    margin-top: 1.5rem;
+    grid-template-columns: repeat(7, 1fr); /* 전체 화면에서 7열 */
+    gap: 20px;
+    margin-top: 1rem;
 }
 
 .seat {
     position: relative;
-    border: 1px solid #999;
-    padding: 35px 25px;  /* padding 증가 */
+    border: 1px solid #ccc;
+    padding: 30px 20px;
     text-align: center;
-    border-radius: 6px;
-    height: 60px;        /* height 증가 */
-    width: 140px;        /* width 추가 */
+    border-radius: 8px;
+    height: 70px;
+    width: 120px;
     cursor: pointer;
-    background-color: #90EE90;
-    transition: background-color 0.3s ease;
+    background-color: #f5f5f5; /* 좌석 기본 배경 */
+    transition: background-color 0.3s ease, transform 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .seat:hover {
-    background-color: #7dcd7d;
+    background-color: #e0e0e0; /* 좌석 호버 배경 */
+    transform: scale(1.05);
 }
 
 .seat.occupied {
-    background-color: #FF6B6B;
+    background-color: #ff6b6b; /* 점유된 좌석 배경 */
     color: white;
-    cursor: not-allowed; /* 금지 표시 커서 */
+    cursor: not-allowed;
 }
 
 .seat-number {
     position: absolute;
-    top: 5px;       /* 위치 조정 */
-    left: 5px;      /* 위치 조정 */
+    top: 5px;
+    left: 5px;
     font-size: 12px;
     color: #333;
     font-weight: bold;
@@ -409,32 +406,28 @@ body {
 }
 
 .status {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
-}
-.close-popup {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #f0f0f0;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    color: #000; /* 텍스트 색상을 검정으로 변경 */
 }
 
-.close-popup:hover {
-  background-color: #ddd;
+.remaining-time {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 12px;
+    color: #333;
+    opacity: 0.8;
 }
 
 /* 로그인 섹션 */
 .auth-container {
-    flex: 0 0 300px;
-    background: white;
+    flex: 0 0 280px;
+    background: #ffffff;
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     height: fit-content;
     min-height: 400px;
     position: relative;
@@ -442,9 +435,10 @@ body {
 
 .auth-container h2 {
     margin-top: 0;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     text-align: center;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    color: #333;
     position: absolute;
     top: 1rem;
     left: 0;
@@ -461,10 +455,10 @@ body {
 }
 
 .message-box {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: #f5f5f5;
+    color: #333;
     padding: 12px;
-    border-radius: 4px;
+    border-radius: 6px;
     text-align: center;
     font-weight: bold;
     font-size: 1rem;
@@ -473,11 +467,11 @@ body {
 }
 
 .message-box.error {
-    color: #d32f2f;
+    color: #ff6b6b;
 }
 
 .form-group {
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -489,16 +483,18 @@ body {
 
 input {
     width: 100%;
-    padding: 0.4rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 0.9rem;
     box-sizing: border-box;
+    background-color: #f5f5f5;
+    color: #333;
 }
 
 input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #58a6ff;
 }
 
 .input-error {
@@ -506,32 +502,36 @@ input:focus {
 }
 
 .button {
-    padding: 0.4rem 0;
+    padding: 0.5rem 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
 }
 
 .button-primary {
-    background-color: #007bff;
-    color: white;
+    background-color: #58a6ff;
+    color: #ffffff;
     width: 100%;
 }
 
 .button-primary:hover {
-    background-color: #0056b3;
+    background-color: #4b9cd3;
 }
 
 .auth-links {
-    margin-top: 0.8rem;
+    margin-top: 1rem;
     text-align: center;
     font-size: 0.8rem;
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    width: 100%;
 }
 
 .auth-links a {
-    color: #007bff;
+    color: #58a6ff;
     text-decoration: none;
     margin: 0 5px;
 }
@@ -546,10 +546,10 @@ input:focus {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: #ffffff;
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
 
@@ -561,17 +561,33 @@ input:focus {
     width: 100%;
     padding: 0.5rem;
     border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
+    border-radius: 6px;
+    background-color: #58a6ff;
+    color: #ffffff;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .time-option button:hover {
-    background-color: #0056b3;
+    background-color: #4b9cd3;
 }
+
+.close-popup {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.close-popup:hover {
+    background-color: #e0e0e0;
+}
+
 /* 반응형 디자인을 위한 미디어 쿼리 추가 */
 @media (max-width: 1200px) {
     .seat-container {
