@@ -13,12 +13,12 @@
                :key="seat.number" 
                class="seat"
                :class="{ 
-                 'occupied': seat.registerid
+                 'occupied': seat.user_name
                }"
-               @click="!seat.registerid && selectSeat(seat.number)">
+               @click="!seat.user_name && selectSeat(seat.number)">
             <span class="seat-number">{{ seat.number }}번</span>
-            <span v-if="seat.registerid" class="remaining-time">{{ formatTime(seat.available_time) }}</span>
-            <span class="status">{{ seat.registerid ? seat.registerid : '빈좌석' }}</span>
+            <span v-if="seat.user_name" class="remaining-time">{{ formatTime(seat.available_time) }}</span>
+            <span class="status">{{ seat.user_name ? seat.user_name : '빈좌석' }}</span>
           </div>
         </div>
       </div>
