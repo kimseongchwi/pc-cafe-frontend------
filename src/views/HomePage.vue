@@ -308,10 +308,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 body {
     margin: 0;
-    background-color: #f0f0f0; /* 더 어두운 바깥 배경 */
+    background-color: #05070a; /* 더 어두운 바깥 배경 */
     color: #e0e0e0; /* 텍스트 색상 */
     font-family: 'Roboto', sans-serif;
 }
@@ -409,7 +409,6 @@ body {
     font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
-    color: #000; /* 텍스트 색상을 검정으로 변경 */
 }
 
 .remaining-time {
