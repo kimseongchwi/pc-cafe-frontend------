@@ -267,7 +267,7 @@ export default {
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 기본적으로 가로로 4개 */
   gap: 1.5rem;
 }
 
@@ -284,7 +284,7 @@ export default {
 
 .menu-image {
   width: 100%;
-  height: 200px;
+  height: 200px; /* MenuManagement.vue와 동일한 높이 */
   object-fit: cover;
 }
 
@@ -448,7 +448,7 @@ export default {
   }
 
   .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* 창 모드에서 가로로 3개 */
   }
 }
 
