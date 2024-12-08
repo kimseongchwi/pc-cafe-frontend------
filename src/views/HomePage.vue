@@ -182,9 +182,10 @@ export default {
                 sessionStorage.setItem('userName', response.data.user.name);
                 sessionStorage.setItem('seatNumber', this.selectedSeat);
 
+                let url = '';
                 if (response.data.user.role === 'admin') {
                     this.isAdmin = true;
-                    this.$router.push('/admin');
+                    url = '/admin';
                 } else {
                     if (!this.selectedSeat) {
                         this.noSeatError = true;
@@ -197,17 +198,20 @@ export default {
                         this.showTimeChargePopup = true;
                         return;
                     }
-                    this.$router.push('/user');
+                    url = '/user';
                 }
+
+                // 새로운 창에서 페이지 열기
+                window.open(url, '_blank');
             }
         } catch (error) {
             this.loginError = true;
             if (error.response && error.response.status === 403) {
                 // 중복 로그인 경고 메시지
-                this.errorMessage = ['중복 로그인되었습니다', '먼저 사용을 종료해주세요'];
+                this.errorMessage = ['중복 로그인되었습니다.', '먼저 사용을 종료해주세요.'];
             } else {
                 console.error('Login error:', error);
-                this.errorMessage = ['가입된 아이디 또는', '비밀번호가 틀립니다'];
+                this.errorMessage = ['가입된 아이디 또는', '비밀번호가 틀립니다.'];
             }
 
             setTimeout(() => {
@@ -215,6 +219,24 @@ export default {
                 this.registeridError = false;
                 this.passwordError = false;
             }, 2000);
+        }
+    },
+    async handleLogout() {
+        try {
+            await axios.post('http://localhost:3000/api/auth/logout', {}, {
+                headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
+            });
+
+            // 세션 스토리지에서 모든 정보 제거
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userRole');
+            sessionStorage.removeItem('userName');
+            sessionStorage.removeItem('seatNumber');
+
+            this.$router.push('/');
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('로그아웃에 실패했습니다.');
         }
     },
     async chargeTime(hours) {
@@ -243,6 +265,11 @@ export default {
       this.passwordError = false;
       this.loginError = false;
       this.noSeatError = false;
+    },
+    preventF5(event) {
+        if ((event.key === 'F5') || (event.ctrlKey && event.key === 'r')) {
+            event.preventDefault();
+        }
     }
   },
   mounted() {
@@ -267,10 +294,16 @@ export default {
     }
     // 2초마다 좌석 정보 업데이트
     this.seatUpdateInterval = setInterval(this.fetchSeats, 2000);
+
+    // F5 키 막기
+    window.addEventListener('keydown', this.preventF5);
   },
   beforeUnmount() {
     // 컴포넌트가 언마운트될 때 인터벌 제거
     clearInterval(this.seatUpdateInterval);
+
+    // F5 키 이벤트 제거
+    window.removeEventListener('keydown', this.preventF5);
   }
 }
 </script>
