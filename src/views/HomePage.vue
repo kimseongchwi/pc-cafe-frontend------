@@ -27,7 +27,10 @@
       <div class="auth-container">
         <h2>로그인</h2>
         <div class="notification-box">
-          <div v-if="!selectedSeat && !noSeatError && !isAdmin" class="message-box">
+          <div v-if="isAdmin" class="message-box">
+            관리자로 로그인되었습니다
+          </div>
+          <div v-else-if="!selectedSeat && !noSeatError" class="message-box">
             좌석을 선택해주세요<br>
             감사합니다
           </div>
@@ -185,6 +188,9 @@ export default {
                 let url = '';
                 if (response.data.user.role === 'admin') {
                     this.isAdmin = true;
+                    setTimeout(() => {
+                      this.isAdmin = false;
+                    }, 2000); // 2초 후 메시지 변경
                     url = '/admin';
                 } else {
                     if (!this.selectedSeat) {
