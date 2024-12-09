@@ -83,31 +83,45 @@ export default {
 
 <style scoped>
 .user-management {
-  padding: 1rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .search-input {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   padding: 0.5rem;
   width: 100%;
   max-width: 300px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 1rem;
 }
 
 .user-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 1rem;
 }
 
-.user-table th, .user-table td {
-  border: 1px solid #ddd;
-  padding: 0.75rem;
-  text-align: left;
+.user-table th,
+.user-table td {
+  padding: 1rem;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .user-table th {
   background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+.user-table tr {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .reset-button {
@@ -122,5 +136,19 @@ export default {
 
 .reset-button:hover {
   background-color: #0056b3;
+}
+
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .user-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .user-table th,
+  .user-table td {
+    min-width: 100px;
+    padding: 0.8rem;
+  }
 }
 </style>

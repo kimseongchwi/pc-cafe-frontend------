@@ -62,6 +62,7 @@
               type="text" 
               required
               maxlength="4"
+              @input="validatePhoneNumber"
             >
             <span>-</span>
             <input 
@@ -69,6 +70,7 @@
               type="text" 
               required
               maxlength="4"
+              @input="validatePhoneNumber"
             >
           </div>
         </div>
@@ -136,9 +138,9 @@ export default {
              this.isRegisteridValid &&
              this.form.password && 
              this.form.name &&
-             this.form.phoneNumberPart1 &&
-             this.form.phoneNumberPart2 &&
-             this.form.phoneNumberPart3 &&
+             this.form.phoneNumberPart1.length == 3 &&
+             this.form.phoneNumberPart2.length == 4 &&
+             this.form.phoneNumberPart3.length == 4 &&
              (this.form.role !== 'admin' || this.form.adminCode);
     }
   },
@@ -176,6 +178,10 @@ export default {
       } finally {
         this.isChecking = false;
       }
+    },
+    validatePhoneNumber() {
+      this.form.phoneNumberPart2 = this.form.phoneNumberPart2.slice(0, 4);
+      this.form.phoneNumberPart3 = this.form.phoneNumberPart3.slice(0, 4);
     },
     async handleRegister() {
       if (!this.canSubmit) {
