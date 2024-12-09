@@ -11,13 +11,12 @@
         <div class="seat-info" v-if="seat.registerid">
           <div class="user-name">{{ seat.user_name }}</div>
           <div class="remaining-time">{{ formatTime(seat.available_time) }}</div>
-          <div class="start-time">{{ formatStartTime(seat.start_time) }}</div> <!-- 시작 시간 표시 -->
+          <div class="start-time">{{ formatStartTime(seat.start_time) }}</div>
         </div>
         <span v-else class="status">빈좌석</span>
       </div>
     </div>
 
-    <!-- 컨텍스트 메뉴 -->
     <div v-if="showMenu" 
          class="context-menu"
          :style="{ top: menuY + 'px', left: menuX + 'px' }">
@@ -25,7 +24,6 @@
       <div class="menu-item" @click="showTimeRemovePopup = true">시간 제거</div>
     </div>
 
-    <!-- 시간 충전 팝업 -->
     <div v-if="showTimeChargePopup" class="popup">
       <div class="popup-content">
         <h3>시간 충전</h3>
@@ -42,7 +40,6 @@
       </div>
     </div>
 
-    <!-- 시간 제거 팝업 -->
     <div v-if="showTimeRemovePopup" class="popup">
       <div class="popup-content">
         <h3>시간 제거</h3>
@@ -91,6 +88,12 @@ export default {
       }
     }
   },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
+  },
   methods: {
     formatTime(seconds) {
       if (!seconds) return '0분';
@@ -111,11 +114,16 @@ export default {
     showContextMenu(event, seat) {
       if (!seat.registerid) return;
       
-      event.preventDefault(); // 기본 컨텍스트 메뉴 방지
+      event.preventDefault();
       this.showMenu = true;
       this.menuX = event.clientX;
       this.menuY = event.clientY;
       this.selectedSeat = seat;
+    },
+    handleClickOutside(event) {
+      if (this.showMenu && !this.$el.contains(event.target)) {
+        this.showMenu = false;
+      }
     },
     async chargeTime(hours) {
       try {
@@ -129,7 +137,7 @@ export default {
           this.$emit('refresh-seats');
           this.showTimeChargePopup = false;
           this.showMenu = false;
-          alert(`${hours}시간을 충전하였습니다.`);
+          alert(`${this.selectedSeat.user_name}님에게 ${hours}시간을 충전하였습니다.`);
         }
       } catch (error) {
         console.error('시간 충전 실패:', error);
@@ -153,7 +161,7 @@ export default {
           this.$emit('refresh-seats');
           this.showTimeRemovePopup = false;
           this.showMenu = false;
-          alert(`${this.removeTimeAmount}분을 제거하였습니다.`);
+          alert(`${this.selectedSeat.user_name}님의 시간을 ${this.removeTimeAmount}분 제거하였습니다.`);
         }
       } catch (error) {
         console.error('시간 제거 실패:', error);
@@ -172,56 +180,70 @@ export default {
 .seat-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr); /* 7개의 열로 설정 */
-  gap: 12px;
+  gap: 20px; /* HomePage와 동일한 간격 */
   margin-top: 1rem;
   justify-content: center;
 }
 
 .seat {
   position: relative;
-  border: 1px solid #ddd;
-  padding: 15px;
+  border: 1px solid #ccc; /* HomePage와 동일한 테두리 */
+  padding: 30px 20px; /* HomePage와 동일한 패딩 */
   text-align: center;
   border-radius: 8px;
-  cursor: context-menu;
-  background-color: #90EE90;
-  height: 80px;
-  width: 120px;
+  cursor: pointer; /* HomePage와 동일한 커서 */
+  background-color: #f5f5f5; /* HomePage와 동일한 배경색 */
+  height: 85px; /* HomePage와 동일한 높이 */
+  width: 130px; /* HomePage와 동일한 너비 */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* HomePage와 동일한 전환 효과 */
+}
+
+.seat:hover {
+  background-color: #e0e0e0; /* HomePage와 동일한 호버 배경색 */
+  transform: scale(1.05); /* HomePage와 동일한 호버 효과 */
 }
 
 .seat.occupied {
-  background-color: #FF6B6B;
+  background-color: #ff6b6b; /* HomePage와 동일한 점유된 좌석 배경 */
   color: white;
 }
 
 .seat-number {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  font-size: 11px;
+  top: 5px; /* HomePage와 동일한 위치 */
+  left: 5px; /* HomePage와 동일한 위치 */
+  font-size: 12px; /* HomePage와 동일한 글씨 크기 */
+  color: #333; /* HomePage와 동일한 색상 */
+  font-weight: bold;
+  opacity: 0.8;
 }
 
 .seat-info {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 12px;
+  font-size: 12px; /* HomePage와 동일한 글씨 크기 */
   width: 100%;
 }
 
 .user-name {
   font-weight: bold;
   margin-bottom: 2px;
-  font-size: 14px;
+  font-size: 14px; /* HomePage와 동일한 글씨 크기 */
 }
 
 .remaining-time {
-  font-size: 12px;
+  position: absolute;
+  top: 5px; /* HomePage와 동일한 위치 */
+  right: 5px; /* HomePage와 동일한 위치 */
+  font-size: 12px; /* HomePage와 동일한 글씨 크기 */
+  color: #333; /* HomePage와 동일한 색상 */
+  opacity: 0.8;
 }
 
 .start-time {
@@ -230,7 +252,9 @@ export default {
 }
 
 .status {
-  font-size: 14px;
+  font-size: 16px; /* HomePage와 동일한 글씨 크기 */
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .context-menu {
