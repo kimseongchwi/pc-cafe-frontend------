@@ -6,7 +6,7 @@
     
     <div class="main-container">
       <!-- 좌석 섹션 -->
-      <div class="seat-section" v-if="!isAdmin">
+      <div class="seat-section">
         <h2>좌석 현황</h2>
         <div class="seat-container">
           <div v-for="seat in seats" 
@@ -203,6 +203,12 @@ export default {
 
                 // 새로운 창에서 페이지 열기
                 window.open(url, '_blank');
+
+                // 로그인 성공 후 데이터 초기화
+                this.registerid = '';
+                this.password = '';
+                this.selectedSeat = null;
+                this.clearAllErrors();
             }
         } catch (error) {
             this.loginError = true;
