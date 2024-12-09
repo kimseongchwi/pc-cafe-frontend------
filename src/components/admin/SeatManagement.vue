@@ -232,9 +232,11 @@ export default {
 }
 
 .user-name {
+  position: relative; /* 위치 조정을 위해 추가 */
   font-weight: bold;
-  margin-bottom: 2px;
-  font-size: 14px; /* HomePage와 동일한 글씨 크기 */
+  margin-bottom: 5px;
+  font-size: 14px;
+  top: 11px; /* 아래로 내리기 위해 추가 */
 }
 
 .remaining-time {
@@ -247,8 +249,10 @@ export default {
 }
 
 .start-time {
-  font-size: 10px;
+  position: relative; /* 위치 조정을 위해 추가 */
+  font-size: 12px;
   color: white;
+  bottom: -9px; /* 아래로 내리기 위해 조정 */
 }
 
 .status {
