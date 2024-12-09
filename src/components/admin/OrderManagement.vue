@@ -1,169 +1,206 @@
 <template>
-    <div class="order-management">
-      <div class="order-header">
-        <h2>주문 관리</h2>
+  <div class="order-management">
+    <div class="order-header">
+      <h2>주문 관리</h2>
+    </div>
+    <div class="order-list">
+      <div class="order-filters">
+        <select v-model="orderStatusFilter" class="filter-select">
+          <option value="all">전체 주문</option>
+          <option value="pending">접수중</option>
+          <option value="processing">처리중</option>
+          <option value="completed">완료</option>
+          <option value="cancelled">취소</option>
+        </select>
       </div>
-      <div class="order-list">
-        <div class="order-filters">
-          <select v-model="orderStatusFilter" class="filter-select">
-            <option value="all">전체 주문</option>
-            <option value="pending">접수중</option>
-            <option value="processing">처리중</option>
-            <option value="completed">완료</option>
-            <option value="cancelled">취소</option>
-          </select>
+
+      <div v-for="(groupOrders, date) in groupedOrders" :key="date" class="order-group">
+        <div class="date-header">
+          <h3>{{ formatDateHeader(date) }}</h3>
+          <div class="bulk-status-buttons">
+            <button 
+              v-for="status in ['pending', 'processing', 'completed', 'cancelled']"
+              :key="status"
+              class="status-btn"
+              :class="{ [status]: true }"
+              @click="updateOrdersStatusByDate(date, status)"
+            >
+              {{ getStatusText(status) }}
+            </button>
+          </div>
         </div>
-  
-        <div v-for="(groupOrders, date) in groupedOrders" :key="date" class="order-group">
-          <h3 class="date-header">{{ formatDateHeader(date) }}</h3>
-          <table class="order-table">
-  <thead>
-    <tr>
-      <th>주문 시간</th>
-      <th>좌석 번호</th>  <!-- 새로 추가 -->
-      <th>주문자</th>
-      <th>메뉴</th>
-      <th>수량</th>
-      <th>총액</th>
-      <th>결제 방식</th>
-      <th>상태</th>
-      <th>관리</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="order in groupOrders" :key="order.id">
-      <td>{{ formatTime(order.created_at) }}</td>
-      <td>{{ order.seat_number }}번</td>  <!-- 새로 추가 -->
-      <td>{{ order.user_name }}</td>
-      <td>{{ order.menuName }}</td>
-      <td>{{ order.quantity }}</td>
-      <td>{{ (order.price * order.quantity).toLocaleString() }}원</td>
-      <td>{{ order.payment_method === 'card' ? '카드' : '현금' }}</td>
-      <td>
-        <span class="status-badge" :class="order.status">
-          {{ getStatusText(order.status) }}
-        </span>
-      </td>
-      <td class="status-buttons">
-                  <button 
-                    v-for="status in ['pending', 'processing', 'completed', 'cancelled']"
-                    :key="status"
-                    class="status-btn"
-                    :class="{ [status]: true, active: order.status === status }"
-                    @click="updateOrderStatus(order.id, status)"
-                  >
-                    {{ getStatusText(status) }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-  
-        <div v-if="filteredOrders.length === 0" class="no-orders">
-          <p>해당하는 주문이 없습니다.</p>
-        </div>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>주문 시간</th>
+              <th>좌석 번호</th>
+              <th>주문자</th>
+              <th>메뉴</th>
+              <th>수량</th>
+              <th>총액</th>
+              <th>결제 방식</th>
+              <th>상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="order in groupOrders" :key="order.id">
+              <td>{{ formatTime(order.created_at) }}</td>
+              <td>{{ order.seat_number }}번</td>
+              <td>{{ order.user_name }}</td>
+              <td>{{ order.menuName }}</td>
+              <td>{{ order.quantity }}</td>
+              <td>{{ (order.price * order.quantity).toLocaleString() }}원</td>
+              <td>{{ order.payment_method === 'card' ? '카드' : '현금' }}</td>
+              <td>
+                <span class="status-badge" :class="order.status">
+                  {{ getStatusText(order.status) }}
+                </span>
+              </td>
+              <td class="status-buttons">
+                <button 
+                  v-for="status in ['pending', 'processing', 'completed', 'cancelled']"
+                  :key="status"
+                  class="status-btn"
+                  :class="{ [status]: true, active: order.status === status }"
+                  @click="updateOrderStatus(order.id, status)"
+                >
+                  {{ getStatusText(status) }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div v-if="filteredOrders.length === 0" class="no-orders">
+        <p>해당하는 주문이 없습니다.</p>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios'
-  
-  export default {
-    name: 'OrderManagement',
-    props: {
-      orders: {
-        type: Array,
-        required: true
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default {
+  name: 'OrderManagement',
+  props: {
+    orders: {
+      type: Array,
+      required: true
+    }
+  },
+  data() {
+    return {
+      orderStatusFilter: 'all',
+      refreshInterval: null
+    }
+  },
+  computed: {
+    filteredOrders() {
+      if (this.orderStatusFilter === 'all') {
+        return this.orders;
       }
+      return this.orders.filter(order => order.status === this.orderStatusFilter);
     },
-    data() {
-      return {
-        orderStatusFilter: 'all',
-        refreshInterval: null
-      }
-    },
-    computed: {
-      filteredOrders() {
-        if (this.orderStatusFilter === 'all') {
-          return this.orders;
+    groupedOrders() {
+      const groups = {};
+      this.filteredOrders.forEach(order => {
+        const date = new Date(order.created_at).toLocaleDateString();
+        if (!groups[date]) {
+          groups[date] = [];
         }
-        return this.orders.filter(order => order.status === this.orderStatusFilter);
-      },
-      groupedOrders() {
-        const groups = {};
-        this.filteredOrders.forEach(order => {
-          const date = new Date(order.created_at).toLocaleDateString();
-          if (!groups[date]) {
-            groups[date] = [];
+        groups[date].push(order);
+      });
+      return groups;
+    }
+  },
+  methods: {
+    formatDateHeader(dateString) {
+      const date = new Date(dateString);
+      const today = new Date();
+
+      if (date.toDateString() === today.toDateString()) {
+        return '오늘';
+      }
+      return dateString;
+    },
+    formatTime(dateString) {
+      return new Date(dateString).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    },
+    getStatusText(status) {
+      const statusMap = {
+        'pending': '접수중',
+        'processing': '처리중',
+        'completed': '완료',
+        'cancelled': '취소'
+      };
+      return statusMap[status] || status;
+    },
+    async updateOrderStatus(orderId, status) {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.put(
+          `/api/orders/${orderId}`, 
+          { status },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           }
-          groups[date].push(order);
-        });
-        return groups;
+        );
+        
+        // 주문 목록 새로고침
+        this.$emit('refresh-orders');
+      } catch (error) {
+        console.error('주문 상태 업데이트 실패:', error);
+        alert('주문 상태 변경에 실패했습니다.');
       }
     },
-    methods: {
-      formatDateHeader(dateString) {
-        const date = new Date(dateString);
-        const today = new Date();
-  
-        if (date.toDateString() === today.toDateString()) {
-          return '오늘';
-        }
-        return dateString;
-      },
-      formatTime(dateString) {
-        return new Date(dateString).toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-      },
-      getStatusText(status) {
-        const statusMap = {
-          'pending': '접수중',
-          'processing': '처리중',
-          'completed': '완료',
-          'cancelled': '취소'
-        };
-        return statusMap[status] || status;
-      },
-      async updateOrderStatus(orderId, status) {
-        try {
-          const token = sessionStorage.getItem('token');
-          await axios.put(
-            `/api/orders/${orderId}`, 
+    async updateOrdersStatusByDate(date, status) {
+      try {
+        const token = sessionStorage.getItem('token');
+        const ordersToUpdate = this.groupedOrders[date];
+        const updatePromises = ordersToUpdate.map(order => 
+          axios.put(
+            `/api/orders/${order.id}`, 
             { status },
             {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
             }
-          );
-          
-          // 주문 목록 새로고침
-          this.$emit('refresh-orders');
-        } catch (error) {
-          console.error('주문 상태 업데이트 실패:', error);
-          alert('주문 상태 변경에 실패했습니다.');
-        }
-      }
-    },
-    mounted() {
-      // 3초마다 주문 목록 새로고침
-      this.refreshInterval = setInterval(() => {
+          )
+        );
+        await Promise.all(updatePromises);
+        
+        // 주문 목록 새로고침
         this.$emit('refresh-orders');
-      }, 3000);
-    },
-    beforeUnmount() {
-      if (this.refreshInterval) {
-        clearInterval(this.refreshInterval);
+      } catch (error) {
+        console.error('주문 상태 일괄 업데이트 실패:', error);
+        alert('주문 상태 일괄 변경에 실패했습니다.');
       }
     }
+  },
+  mounted() {
+    // 3초마다 주문 목록 새로고침
+    this.refreshInterval = setInterval(() => {
+      this.$emit('refresh-orders');
+    }, 3000);
+  },
+  beforeUnmount() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
-  </script>
-  
-  <style scoped>
+}
+</script>
+
+<style scoped>
 .order-management {
   background: white;
   padding: 2rem;
@@ -195,10 +232,20 @@
 }
 
 .date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #eee;
   color: #333;
+}
+
+.bulk-status-buttons {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+  margin-right: 30px; /* 버튼을 살짝 왼쪽으로 이동 */
 }
 
 .order-table {
