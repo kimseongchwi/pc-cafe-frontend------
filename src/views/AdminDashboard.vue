@@ -259,10 +259,21 @@ export default {
         this.logout();
       }
     },
-    logout() {
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('userRole');
-      this.$router.push('/');
+    async logout() {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.post('/api/auth/logout', {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch (error) {
+        console.error('로그아웃 실패:', error);
+      } finally {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('userRole');
+        this.$router.push('/');
+      }
     }
   },
   watch: {
