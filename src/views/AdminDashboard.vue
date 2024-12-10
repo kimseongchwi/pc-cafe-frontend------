@@ -1,6 +1,7 @@
 <template>
   <div class="admin-dashboard">
     <header class="header">
+      <img src="/로고.png" alt="PC방 로고" class="logo-image" />
       <div class="header-content">
         <h1>PC방 관리자</h1>
         <div class="admin-tabs">
@@ -318,21 +319,33 @@ export default {
 }
 
 .header {
+  display: flex;
+  align-items: center;
   background-color: #333;
   color: white;
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 1rem;
+  height: 80px; /* 상단바 높이 고정 */
+  overflow: hidden; /* 내용이 상단바를 넘지 않도록 */
+}
+
+.logo-image {
+  max-width: 100px; /* 로고의 최대 너비 */
+  height: auto;
+  margin-right: 5px; /* 로고와 텍스트 사이의 간격 */
+  max-height: 100%; /* 로고의 최대 높이를 상단바 높이에 맞춤 */
 }
 
 .header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .admin-tabs {

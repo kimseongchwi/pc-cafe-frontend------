@@ -1,7 +1,8 @@
 <template>
   <div class="home-page">
     <header class="header">
-      <h1>OO PC방에 방문해주셔서 감사합니다</h1>
+      <img src="/로고.png" alt="PC방 로고" class="logo-image" />
+      <h1>PC 방에 방문해주셔서 감사합니다</h1>
     </header>
     
     <div class="main-container">
@@ -335,16 +336,28 @@ body {
 }
 
 .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #161b22; /* 헤더 배경 */
     color: #58a6ff; /* 헤더 텍스트 색상 */
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    height: 120px; /* 상단바 높이 고정 */
+    overflow: hidden; /* 내용이 상단바를 넘지 않도록 */
+}
+
+.logo-image {
+    max-width: 200px; /* 로고의 최대 너비 */
+    height: auto;
+    margin-right: 20px; /* 로고와 텍스트 사이의 간격 */
 }
 
 .header h1 {
     margin: 0;
     font-size: 2.5rem;
+    line-height: 1; /* 텍스트의 줄 높이를 조정하여 상단바 높이에 맞춤 */
 }
 
 .main-container {

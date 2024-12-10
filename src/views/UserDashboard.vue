@@ -6,8 +6,9 @@
     </div>
 
     <header class="header">
+      <img src="/로고.png" alt="PC방 로고" class="logo-image" />
       <div class="header-content">
-        <h1 class="header-title">OO PC방</h1>
+        <h1 class="header-title">PC CAFE</h1>
         <div class="user-info">
           <span class="seat-number">{{ seatNumber }}번 좌석</span>
           <span>{{ name }} 님</span>
@@ -430,11 +431,19 @@ export default {
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background-color: #333;
   color: white;
   padding: 1rem;
+  height: 80px; /* 상단바 높이 고정 */
+  overflow: hidden; /* 내용이 상단바를 넘지 않도록 */
+}
+
+.logo-image {
+  max-width: 100px; /* 로고의 최대 너비 */
+  height: auto;
+  margin-right: -5px; /* 로고와 텍스트 사이의 간격 */
+  max-height: 100%; /* 로고의 최대 높이를 상단바 높이에 맞춤 */
 }
 
 .header-content {
