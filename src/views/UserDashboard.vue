@@ -59,7 +59,7 @@
         <button @click="chargeTime(hours)">{{ hours }}시간 - {{ price }}원</button>
       </div>
       <div>
-        <label>결제 방식:</label>
+        <label>결제 방식  </label>
         <select v-model="selectedPaymentMethod">
           <option value="cash">현금</option>
           <option value="card">카드</option>
@@ -538,7 +538,39 @@ export default {
   background-color: #f0f0f0;
 }
 
-.time-charge-popup, .password-change-popup, .logout-popup {
+.time-charge-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  width: 300px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+  text-align: center; /* 제목과 내용을 가운데 정렬 */
+}
+
+.time-charge-popup h2 {
+  margin-bottom: 1.5rem; /* 제목과 시간 선택 버튼 사이의 여백 */
+}
+
+.logout-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+  text-align: center; /* 제목과 내용을 가운데 정렬 */
+}
+
+
+.password-change-popup{
   position: fixed;
   top: 50%;
   left: 50%;
@@ -579,6 +611,7 @@ export default {
   color: #333;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  float: right; /* 닫기 버튼을 오른쪽으로 이동 */
 }
 
 .close-popup:hover {
@@ -602,6 +635,29 @@ export default {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.button:hover {
+  background-color: #ddd;
+}
+
+.button-primary:hover {
+  background-color: #0056b3;
 }
 
 .logout-message {
