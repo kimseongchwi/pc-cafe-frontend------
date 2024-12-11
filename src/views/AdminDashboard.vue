@@ -34,7 +34,7 @@
             :class="{ active: currentTab === 'users' }"
             @click="setTab('users')"
           >
-            사용자 관리
+            회원 관리
           </button>
         </div>
         <div class="user-info">
