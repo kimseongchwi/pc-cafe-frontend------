@@ -104,7 +104,7 @@
               <button @click="startEdit(menu)" class="button button-small button-edit">
                 수정
               </button>
-              <button @click="deleteMenu(menu.id)" class="button button-small button-delete">
+              <button @click="deleteMenu(menu.id, menu.name)" class="button button-small button-delete">
                 삭제
               </button>
             </div>
@@ -322,8 +322,9 @@ export default {
       this.editImageFile = null;
       this.editImagePreview = null;
     },
-    async deleteMenu(id) {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
+    async deleteMenu(id, name) {
+    const confirmation = confirm(`${name}을(를) 삭제하시겠습니까?`);
+    if (!confirmation) return;
 
       try {
         const token = sessionStorage.getItem('token');
